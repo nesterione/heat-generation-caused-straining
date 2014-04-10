@@ -1,4 +1,4 @@
-package by.nesterenya.fem.analysis;
+package by.nesterenya.fem.analysis.init;
 
 public class DataInitThermalStatic implements IDataInit {
  
@@ -15,5 +15,4 @@ public class DataInitThermalStatic implements IDataInit {
   public void setInitialThemperature(double initialThemperature) {
     this.initialThemperature = initialThemperature;
   }
-  
 }

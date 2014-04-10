@@ -6,8 +6,6 @@ import javax.media.opengl.GL2GL3;
 
 import by.nesterenya.fem.primitives.Box;
 
-
-
 public class GLPrimitives {
 
   /**

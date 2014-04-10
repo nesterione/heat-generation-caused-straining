@@ -2,13 +2,12 @@ package by.nesterenya.fem.analysis;
 
 import java.util.List;
 
+import by.nesterenya.fem.analysis.init.DataInitThermalStatic;
+import by.nesterenya.fem.analysis.result.StaticThermalResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.mesh.IMesh;
-import by.nesterenya.fem.mesh.Mesh;
 import by.nesterenya.fem.primitives.Box;
 import by.nesterenya.fem.solver.ThermalStaticSolver;
-
-
 
 public class ThermalStaticAnalisis extends Analysis{
  
@@ -20,7 +19,7 @@ public class ThermalStaticAnalisis extends Analysis{
     this.dataInit = initData;
   }
    
-  private Result result;
+  private StaticThermalResult result;
 
   public Box getGeometry() {
     return geometry;
@@ -46,12 +45,12 @@ public class ThermalStaticAnalisis extends Analysis{
     this.loads = loads;
   }
 
-  public Result getResult() {
+  public StaticThermalResult getResult() {
     return result;
   }
 
-  public void setResult(Result result) {
-    this.result = (Result) result;
+  public void setResult(StaticThermalResult result) {
+    this.result = (StaticThermalResult) result;
   }
 
   @Override

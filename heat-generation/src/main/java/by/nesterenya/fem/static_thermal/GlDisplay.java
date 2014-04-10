@@ -14,19 +14,23 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
+import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
+import by.nesterenya.fem.analysis.result.StaticDeformationResult;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
   
 public class GlDisplay extends GLCanvas implements GLEventListener {
 
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT
+	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT
 	  };
 	
 	private Box model;
 	private IMesh mesh;
 	private ThermalStaticAnalisis analysis;
+	private StaticDeformationAlalysis analysis_d;
+	
 	private GLU glu;
 	private GL2 gl;
 	private DisplayType displayType = DisplayType.MODEL;
@@ -100,6 +104,9 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	        case MESHRESULT:
 	          //plotMehResult();
 	          break;
+	        case MEH_RESULT:
+	        	if(analysis_d!=null) {  GLPainterHelper.plotDeformationResult(gl, position, analysis_d); }
+	        	break;
 	      }
 	    } catch (Exception e) {
 	      e.printStackTrace();
@@ -175,6 +182,10 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 		return analysis;
 	}
 
+	public void setAnalysisD(StaticDeformationAlalysis analysis) {
+		this.analysis_d = analysis;
+	}
+	
 	public void setAnalysis(ThermalStaticAnalisis analysis) {
 		this.analysis = analysis;
 	}

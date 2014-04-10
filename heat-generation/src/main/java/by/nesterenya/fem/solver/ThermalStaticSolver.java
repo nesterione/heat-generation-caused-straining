@@ -1,7 +1,7 @@
 package by.nesterenya.fem.solver;
 
-import by.nesterenya.fem.analysis.Result;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
+import by.nesterenya.fem.analysis.result.StaticThermalResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticTemperature;
 import by.nesterenya.fem.element.IElement;
@@ -219,7 +219,7 @@ public class ThermalStaticSolver {
 			e.printStackTrace();
 		}
 
-		analis.setResult(new Result(T1));
+		analis.setResult(new StaticThermalResult(T1));
 	}
 
 	private int getGlobalNumberNode(INode node) {

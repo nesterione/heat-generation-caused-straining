@@ -20,10 +20,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.plaf.DimensionUIResource;
 
-import by.nesterenya.fem.analysis.DataInitThermalStatic;
+import by.nesterenya.fem.analysis.init.*;
+import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.boundary.ILoad;
+import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.StaticTemperature;
+import by.nesterenya.fem.boundary.Support;
 import by.nesterenya.fem.element.material.Material;
 import by.nesterenya.fem.mesh.BoxMesher;
 import by.nesterenya.fem.mesh.IMesh;
@@ -32,7 +36,7 @@ import by.nesterenya.fem.primitives.Box;
 import by.nesterenya.fem.static_thermal.GlDisplay.DisplayType;
 
 import com.jogamp.opengl.util.FPSAnimator;
-
+//TODO переместить в пакетд dynamic thermal
 public class STModeling implements ActionListener {
 
 	/**
@@ -250,6 +254,78 @@ public class STModeling implements ActionListener {
 		});
 		leftPanel.add(btn_solve);
 		
+		
+		JButton btn_solveDef = new JButton();
+		btn_solveDef.setText("Deform");
+		btn_solveDef.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+			//TODO now I use for calculation fixed values which was hardcoded
+			//TODO make a entering values with GUI
+				
+			double box_ox = Double.parseDouble(tb_plateLenght.getText());
+			double box_oy = Double.parseDouble(tb_plateWidth.getText());
+			double box_oz = Double.parseDouble(tb_plateHeight.getText());
+				
+			Box box = new Box(box_ox, box_oy, box_oz);
+				
+			//TODO объеденить параметры сетки в одни класс
+			int nodeCountOX =  Integer.parseInt(tb_nodeCountOX.getText());
+			int nodeCountOY =  Integer.parseInt(tb_nodeCountOY.getText());
+			int nodeCountOZ =  Integer.parseInt(tb_nodeCountOZ.getText());
+				
+			IMesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
+				
+			IMesh mesh = null;
+			try {
+				 mesh = mesher.formMesh();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+			StaticDeformationAlalysis analysis = new StaticDeformationAlalysis();
+			
+			analysis.setGeometry(box);
+			analysis.setMesh(mesh);
+			//analysis.setDataInit(new DataInitThermalStatic(300));
+				
+			List<ILoad> loads = new ArrayList<>();
+			//TODO: задавать направление действия силы
+			loads.add( new StaticEvenlyDistributedLoad(1100000, analysis.getMesh().getBoundaries().get("верхняя")));
+			loads.add( new Support(analysis.getMesh().getBoundaries().get("левая")) );
+			loads.add( new Support(analysis.getMesh().getBoundaries().get("правая")) );
+			
+			//loads.add(new StaticTemperature(400, analysis.getMesh().getBoundaries().get("левая")));
+			//loads.add(new StaticTemperature(300, analysis.getMesh().getBoundaries().get("правая")));
+			
+			Material material = new Material();
+			material.setDensity(7850);
+			material.setName("sdf");
+			//material.setThermalConductivity(60.5);
+			//material.setSpecificHeatCapacity(434);
+			material.setPoissonsRatio(0.3);
+			material.setElasticModulus(2100000000);
+			
+			analysis.getMesh().getMaterial().put(0,material );
+			
+			analysis.setLoads(loads);
+			
+			try {
+				analysis.solve();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//glDisplay.setModel(box);
+			glDisplay.setAnalysisD(analysis);
+			glDisplay.setDisplayType(DisplayType.MEH_RESULT);
+			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
+				
+				glDisplay.display();
+			}
+		});
+		leftPanel.add(btn_solveDef);
 		
 		splitPane.setLeftComponent(leftPanel);
 
