@@ -2,8 +2,11 @@ package by.nesterenya.fem.solver;
 
 import java.util.List;
 
+import by.nesterenya.fem.analysis.Analysis;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
+import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
@@ -307,21 +310,61 @@ public class StaticDeformationSolver {
 	public void Solve() throws Exception {
 		double[][] gK = formGlobalK();
 		setBoundaries(gK);
+		
+		
+		//Calculation of Deformation 
 		R = MMath.gausSLAU(gK, R);
 		
-		//form result
+		//form deformation result
 		int nodeSize = analisis.getMesh().getNodes().size();
-		double[] X = new double[nodeSize];
-		double[] Y = new double[nodeSize];
-		double[] Z = new double[nodeSize];
+		Deformation[] deformations = new Deformation[nodeSize];
 		
 		for(int i = 0; i< nodeSize; i++) {
-			X[i] = R[i*DEGREES_OF_FREEDOM];
-			Y[i] = R[i*DEGREES_OF_FREEDOM + 1];
-			Z[i] = R[i*DEGREES_OF_FREEDOM + 2];
+			
+			double defX = R[i*DEGREES_OF_FREEDOM];
+			double defY = R[i*DEGREES_OF_FREEDOM + 1];
+			double defZ = R[i*DEGREES_OF_FREEDOM + 2];
+			
+			deformations[i] = new Deformation(defX, defY, defZ);
 		}
 		
-		analisis.setResult(new StaticDeformationResult(X,Y,Z));
+		//Calculation of Strain
+		List<IElement> elements =  analisis.getMesh().getElements();
+		
+		Strain[] strains = new Strain[elements.size()];
+		
+		double[][] Q  = formMatrixQ();
+		
+		for (IElement element : elements) {
+			
+			// Формируем координатную матрицу для текущего элемента
+			double[][] A = formMatrixA(element);		
+			B = MMath.INV(A);
+			
+			double[][] QQ = MMath.MUL(Q, B); 
+			
+			// Tetr element has 4 nodes
+			final int COUNT_NODES_IN_ELEMENT = 4;
+			double[] curDeff = new double[DEGREES_OF_FREEDOM*COUNT_NODES_IN_ELEMENT];
+			
+			for(int i = 0; i < COUNT_NODES_IN_ELEMENT; i++) {
+				INode node = element.getNode(i);
+				int nodeNumber = analisis.getMesh().getNodes().indexOf(node);
+				
+				curDeff[i*DEGREES_OF_FREEDOM] = deformations[nodeNumber].getX();
+				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations[nodeNumber].getY();
+				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations[nodeNumber].getZ();
+			}
+		
+			double[] e_e = MMath.MUL(QQ, curDeff);
+			
+			int elemNumber = analisis.getMesh().getElements().indexOf(element);
+			
+			strains[elemNumber] = new Strain(e_e[0], e_e[1], e_e[2], e_e[3], e_e[4], e_e[5]);
+		}
+		
+		StaticDeformationResult result = new StaticDeformationResult(deformations, strains);
+		analisis.setResult(result);
 	}
 
 	public double getResultX(int i) {

@@ -319,7 +319,8 @@ public class STModeling implements ActionListener {
 			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
-			glDisplay.setDisplayType(DisplayType.MEH_RESULT);
+			//glDisplay.setDisplayType(DisplayType.MEH_RESULT);
+			glDisplay.setDisplayType(DisplayType.STRAIN);
 			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
 				
 				glDisplay.display();
