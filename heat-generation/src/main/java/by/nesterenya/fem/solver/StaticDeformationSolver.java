@@ -6,6 +6,7 @@ import java.util.List;
 import by.nesterenya.fem.analysis.Analysis;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.result.Deformation;
+import by.nesterenya.fem.analysis.result.DeformationInNode;
 import by.nesterenya.fem.analysis.result.StaticDeformationResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.boundary.ILoad;
@@ -358,6 +359,8 @@ public class StaticDeformationSolver {
 		
 		double[][] Q  = formMatrixQ();
 		
+		DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
+		
 		for (IElement element : elements) {
 			
 			// Формируем координатную матрицу для текущего элемента
@@ -384,10 +387,31 @@ public class StaticDeformationSolver {
 			int elemNumber = analisis.getMesh().getElements().indexOf(element);
 			
 			strains[elemNumber] = new Strain(e_e[0], e_e[1], e_e[2], e_e[3], e_e[4], e_e[5]);
+		
+		
+			//form values of ecvivalent of deformation in nodes
+			for(int i =0;i< COUNT_NODES; i++) {
+				int ind_sj = analisis.getMesh().getNodes()
+						.lastIndexOf(element.getNode(i));
+				
+				double eInNode = e_e[0]+e_e[1]+e_e[2];
+				
+				//если значение в узле нету
+				if(defInNodes[ind_sj] == null) {
+					defInNodes[ind_sj] = new DeformationInNode(eInNode);
+				} else {
+					double nDef = (defInNodes[ind_sj].getValue() + eInNode)/2.0;
+					defInNodes[ind_sj] = new DeformationInNode(nDef);
+				}
+				
+			}
+			
 		}
 		
 		StaticDeformationResult result = new StaticDeformationResult(deformations, strains);
+		result.setDeformationInNode(defInNodes);
 		analisis.setResult(result);
+		
 	}
 
 	public double getResultX(int i) {

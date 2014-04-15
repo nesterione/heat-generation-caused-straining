@@ -3,6 +3,7 @@ package by.nesterenya.fem.analysis.result;
 //TODO подумать о замене массивов на коллекции
 public class StaticDeformationResult implements IResult {
 
+	private DeformationInNode[] deformationInNode;
 	private Deformation[] deformations;
 	private Strain[] strains;
 	
@@ -25,5 +26,13 @@ public class StaticDeformationResult implements IResult {
 
 	public void setStrains(Strain[] strains) {
 		this.strains = strains;
+	}
+
+	public DeformationInNode[] getDeformationInNode() {
+		return deformationInNode;
+	}
+
+	public void setDeformationInNode(DeformationInNode[] deformationInNode) {
+		this.deformationInNode = deformationInNode;
 	}
 }

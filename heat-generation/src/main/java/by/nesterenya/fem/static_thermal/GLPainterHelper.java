@@ -395,8 +395,89 @@ public class GLPainterHelper {
 	}
 	
 	
-	//TODO проверить изменение растояния в у STREEs вектор изменения растояния между узлами
+	public static void plotStrainInNodesResult(GL2 gl, Position position, StaticDeformationAlalysis analysis) throws Exception {
+		gl.glTranslatef(0.0f, 0.0f, -6.0f);
+
+	    gl.glScaled(position.getZoom(), position.getZoom(), position.getZoom()); // screen
+
+	    // TODO изменить положение камеры правильным образом
+	    // gluLookAt(0.0, 0.0, 25.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+	    gl.glRotated(position.getAngle_x(), 0.0, 1.0, 0.0);
+	    gl.glRotated(position.getAngle_y(), 1.0, 0.0, 0.0);
+
+	    // Рисуем координатные оси
+	    GLPrimitives.drawCoordinateSystem(gl);
+
+	    gl.glTranslated(position.getMove_x(), position.getMove_y(), 0);
+
+	    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+	    gl.glEnable(GL.GL_BLEND);
+	    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
+
+	    gl.glTranslatef(0, 0, 0.001f);
+	    gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+
+	    gl.glPointSize(4);
+	    gl.glEnable(GL2ES1.GL_POINT_SMOOTH); // включаем режим сглаживания точек
+
+	    gl.glEnd();
+
+	    gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
+
+	    gl.glBegin(GL.GL_TRIANGLES);
+	    List<IElement> elements = analysis.getMesh().getElements();
+	    for (IElement element : elements) {
+
+	      INode node0 = element.getNode(0);
+	      INode node1 = element.getNode(1);
+	      INode node2 = element.getNode(2);
+	      INode node3 = element.getNode(3);
+	     
+	      
+	      //Strain for all element
+	     
+	      DrawGLColor3fStrainInNode(gl, node0, analysis);
+	      drawGLVertex3d_deformation(gl,node0, analysis);
+	      DrawGLColor3fStrainInNode(gl, node1, analysis);
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      DrawGLColor3fStrainInNode(gl, node2, analysis);
+	      drawGLVertex3d_deformation(gl,node2, analysis);
+
+	      DrawGLColor3fStrainInNode(gl, node0, analysis);
+	      drawGLVertex3d_deformation(gl,node0, analysis);
+	      DrawGLColor3fStrainInNode(gl, node1, analysis);
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      DrawGLColor3fStrainInNode(gl, node3, analysis);
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+
+	      DrawGLColor3fStrainInNode(gl, node1, analysis);
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      DrawGLColor3fStrainInNode(gl, node2, analysis);
+	      drawGLVertex3d_deformation(gl,node2, analysis);
+	      DrawGLColor3fStrainInNode(gl, node3, analysis);
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+ 
+	      DrawGLColor3fStrainInNode(gl, node0, analysis);
+	      drawGLVertex3d_deformation(gl,node0, analysis);
+	      DrawGLColor3fStrainInNode(gl, node2, analysis);
+	      drawGLVertex3d_deformation(gl,node2, analysis);
+	      DrawGLColor3fStrainInNode(gl, node3, analysis);
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+	    }
+	    gl.glEnd();
+
+	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
+	    gl.glTranslatef(0, 0, -0.001f);
+
+	    gl.glDisable(GL.GL_BLEND);
+	    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+	    gl.glFlush();
+	}
 	
+	//TODO проверить изменение растояния в у STREEs вектор изменения растояния между узлами
 	
 	private static void DrawGLColor3fStrain(GL2 gl, IElement element, StaticDeformationAlalysis analysis) {
 		int indexElement = analysis.getMesh().getElements().indexOf(element);
@@ -407,6 +488,14 @@ public class GLPainterHelper {
 		double vectorOfDeformation = calcVL(strain);
 		
 		setColorStraining(gl, vectorOfDeformation, analysis.getResult());
+	}
+	
+	private static void DrawGLColor3fStrainInNode(GL2 gl, INode node, StaticDeformationAlalysis analysis) {
+		int indexElement = analysis.getMesh().getNodes().indexOf(node);
+		
+		double v = analysis.getResult().getDeformationInNode()[indexElement].getValue();
+		
+		setColorStraining(gl, v, analysis.getResult());
 	}
 	
 	
@@ -555,7 +644,7 @@ public class GLPainterHelper {
 		    
 		    value = Math.abs(value);
 		    //TODO удалить
-		   /*
+		   
 		    double mx = 0;
 		    double my = 0;
 		    double mz = 0;
@@ -578,7 +667,7 @@ public class GLPainterHelper {
 		    System.out.println(my);
 		    System.out.println(mz);
 		    System.out.println("e");
-		    */
+		    
 		    
 		    //TODO ~удалить
 		     

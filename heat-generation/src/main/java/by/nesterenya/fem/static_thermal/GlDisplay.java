@@ -23,7 +23,7 @@ import by.nesterenya.fem.primitives.Box;
 public class GlDisplay extends GLCanvas implements GLEventListener {
 
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT, STRAIN
+	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT, STRAIN, STRAIN_IN_NODES
 	  };
 	
 	private Box model;
@@ -110,6 +110,10 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	        case STRAIN:
 	        	if(analysis_d!=null) {
 	        		GLPainterHelper.plotStrainResult(gl, position, analysis_d);
+	        	}
+	        case STRAIN_IN_NODES:
+	        	if(analysis_d!=null) {
+	        		GLPainterHelper.plotStrainInNodesResult(gl, position, analysis_d);
 	        	}
 	      }
 	    } catch (Exception e) {
