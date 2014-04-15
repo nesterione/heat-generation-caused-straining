@@ -1,5 +1,6 @@
 package by.nesterenya.fem.solver;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import by.nesterenya.fem.analysis.Analysis;
@@ -111,6 +112,26 @@ public class StaticDeformationSolver {
 	public double[][] formMatrixE(double locG, double locMy) {
 
 		// This variables if for better readable code
+		
+		
+		//NOTE переделал по новому зенкевичу
+		double a = 1 - locMy;
+		double b = (1-2*locMy)/2.0;
+		double c = locMy;
+		
+		double[][] E = { 
+			{ a, c, c, 0, 0, 0 }, 
+			{ c, a, c, 0, 0, 0 },
+			{ c, c, a, 0, 0, 0 }, 
+			{ 0, 0, 0, b, 0, 0 },
+			{ 0, 0, 0, 0, b, 0 }, 
+			{ 0, 0, 0, 0, 0, b } };
+
+		double kafE = locG/((1+locMy)*(1-2.0*locMy));
+		E = MMath.MUL(E, kafE);
+
+		
+		/*
 		double a = locMy / (1 - locMy);
 		double b = (1.0f - 2.0f * locMy) / (2.0f * (1.0f - locMy));
 
@@ -124,7 +145,7 @@ public class StaticDeformationSolver {
 
 		double kafE = (locG * (1 - locMy)) / ((1 + locMy) * (1 - 2.0f * locMy));
 		E = MMath.MUL(E, kafE);
-
+*/
 		return E;
 	}
 
@@ -218,7 +239,7 @@ public class StaticDeformationSolver {
 			B = MMath.INV(A);
 
 			double Ve = calcVolumeOfElement(element);
-			
+
 			// Формирование локальной матрицы жесткости
 			double[][] K;
 		    K = MMath.MUL(MMath.T(B), MMath.T(Q));
@@ -255,7 +276,7 @@ public class StaticDeformationSolver {
 		return gK;
 	}
 
-	public void setBoundaries(double[][] gK) {
+	public void setBoundaries(double[][] gK) throws Exception {
 
 		// Важно чтобы фиксация происходила после указания нагрузок
 		for (ILoad load : analisis.getLoads()) {
@@ -289,14 +310,84 @@ public class StaticDeformationSolver {
 		}
 	}
 
-	private void addLoad(StaticEvenlyDistributedLoad distrubutedLoad) {
+	private void addLoad(StaticEvenlyDistributedLoad distrubutedLoad) throws Exception {
+		
+		//Определить какие конечные элементы принадлежат текущей грани
+		/*
+		List<IElement> elements = analisis.getMesh().getElements();
 
+		// Здесь усовершенствованый метод задания равномерно-распределенной нагрузки
+		// здесь определяються конечные элементы, на грани которых прилогаеться равномерно-
+		// распределенная нагрузка, т.е. те у которых 3 узла находяться на грани, на которую 
+		// прилогаеться нагрузка. 
+		// Дальше вычесление взято с зенкевича,  F = (N)T*b*S, где b компоненты нагрузки, S- 
+		// площадь треугольника
+		for(IElement element : elements) {
+			
+			//boolean isLoaded = false;		
+			List<INode> loadedNodes = new ArrayList<>();
+			
+			double[] b = new double[COUNT_NODES*DEGREES_OF_FREEDOM];
+			for(int i = 0; i<COUNT_NODES; i++ ) {
+				INode currentNode = element.getNode(i);
+			
+				// Проверка или в текущем конечном элементе есть 
+				// узлы попадающие в нагруженную грань
+				// и если узел попадает то нагрузить его в соответствующем векторе, 
+				// иначе пропустить
+				if(distrubutedLoad.getBoundary().getNodes().indexOf(currentNode)!=-1) {
+					loadedNodes.add(currentNode);
+					//TODO пока нагружаеться только ось Z мозможно исправить
+					b[i*DEGREES_OF_FREEDOM+2] = distrubutedLoad.getLoad();
+				} 
+			}
+			
+			
+			//если элемент нагруженный то добавить силу
+			//if(isLoaded) {
+			if(loadedNodes.size()==3) {	
+
+				// Формируем координатную матрицу для текущего элемента
+				double[][] A = formMatrixA(element);	
+				double[][] N  =A;// MMath.T(A);
+				
+				//double Ve = calcVolumeOfElement(element);
+				//calc square loaded triangle
+				double[][] det = {
+						{1, loadedNodes.get(0).getValueOfDemention(Dim.X), loadedNodes.get(0).getValueOfDemention(Dim.Y)},
+						{1, loadedNodes.get(1).getValueOfDemention(Dim.X), loadedNodes.get(1).getValueOfDemention(Dim.Y)},
+						{1, loadedNodes.get(2).getValueOfDemention(Dim.X), loadedNodes.get(2).getValueOfDemention(Dim.Y)}
+				};
+				
+				double St = Math.abs(MMath.DET(det) * 0.5);
+				
+				double[] locR = MMath.MUL(MMath.MUL(N, b), St);
+			
+				for (int si = 0; si < COUNT_NODES; si++) {
+					for (int ki = 0; ki < DEGREES_OF_FREEDOM; ki++) {
+	
+						// TODO Возможна ошибка при нахождении индекса в
+						// коллекции
+						int ind_si = analisis.getMesh().getNodes()
+								.lastIndexOf(element.getNode(si));
+	
+						// здесь должен быть минут, т.к. сла действует в противоположную силу
+						R[ind_si * DEGREES_OF_FREEDOM + ki] -= locR[si * DEGREES_OF_FREEDOM + ki];
+					}
+				}
+			}	
+		}
+		*/
+
+		//Улучшенный вариант задания равномерно-распределеннной нагрузки
+		
 		double nodeLoad = distrubutedLoad.getLoad()
 				/ distrubutedLoad.getSquare();
-
+		
+		System.out.println(distrubutedLoad.getBoundary().getNodes().size());
+		nodeLoad = nodeLoad/(distrubutedLoad.getBoundary().getNodes().size()/3);
+		
 		for (INode node : distrubutedLoad.getBoundary().getNodes()) {
-			// TODO Сделать чтобы при добавлении температуры значения доже
-			// прибавлялиьс
 
 			// Значение должно прибовлятся к существующему, так как на некоторые
 			// узлы уже может быть

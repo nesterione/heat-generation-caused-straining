@@ -291,7 +291,10 @@ public class STModeling implements ActionListener {
 				
 			List<ILoad> loads = new ArrayList<>();
 			//TODO: задавать направление действия силы
-			loads.add( new StaticEvenlyDistributedLoad(1100000, analysis.getMesh().getBoundaries().get("верхняя")));
+			loads.add( new StaticEvenlyDistributedLoad(1100000000, analysis.getMesh().getBoundaries().get("верхняя")));
+			//loads.add( new StaticEvenlyDistributedLoad(100000, analysis.getMesh().getBoundaries().get("верхняя")));
+			    
+			
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("левая")) );
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("правая")) );
 			
@@ -304,7 +307,8 @@ public class STModeling implements ActionListener {
 			//material.setThermalConductivity(60.5);
 			//material.setSpecificHeatCapacity(434);
 			material.setPoissonsRatio(0.3);
-			material.setElasticModulus(2100000000);
+			material.setElasticModulus(200000000000.0); 
+			                       
 			
 			analysis.getMesh().getMaterial().put(0,material );
 			
@@ -319,8 +323,8 @@ public class STModeling implements ActionListener {
 			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
-			//glDisplay.setDisplayType(DisplayType.MEH_RESULT);
-			glDisplay.setDisplayType(DisplayType.STRAIN);
+			glDisplay.setDisplayType(DisplayType.MEH_RESULT);
+			//glDisplay.setDisplayType(DisplayType.STRAIN);
 			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
 				
 				glDisplay.display();

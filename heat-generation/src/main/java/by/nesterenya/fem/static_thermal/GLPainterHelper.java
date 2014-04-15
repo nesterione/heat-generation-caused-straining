@@ -433,18 +433,32 @@ public class GLPainterHelper {
 	}
 	
 	private static double calcVL(Strain strain){
-		return Math.sqrt( strain.getEx()*strain.getEx()+strain.getEy()*strain.getEy()+strain.getEz()*strain.getEz()  );
+		//return Math.sqrt( strain.getEx()*strain.getEx()+strain.getEy()*strain.getEy()+strain.getEz()*strain.getEz()  );
+		
+		double x = strain.getEx();
+		double y = strain.getEy();
+		double z = strain.getEz();
+		
+		if(x>y&&x>z) 
+			return x;
+		if(y>z&&y>x)
+			return y;
+		else  
+			return z;
+		
+		//return strain.getEx()+strain.getEy()+strain.getEz();
 	}
 	
 	private static int setColorStraining(GL2 gl, double value, StaticDeformationResult result) {
 	    
 		Strain[] strains = result.getStrains();
 		//TODO Оптимизировать, без лишних пересчетов
-	    double min = calcVL(strains[0]); 
-	    double max = calcVL(strains[0]);
+	    double min = Math.abs(calcVL(strains[0])); 
+	    double max = Math.abs(calcVL(strains[0]));
 	    
 	    for(int i= 0;i<result.getDeformations().length;i++) {
-	    	double curValue = calcVL(strains[i]);
+	    	
+	    	double curValue = Math.abs(calcVL(strains[i]));
 	    	
 	      if(min> curValue) {
 	        min = curValue;
@@ -452,7 +466,30 @@ public class GLPainterHelper {
 	      if(max< curValue) {
 	        max = curValue;
 	      }
+	      
 	    }
+	    
+	    value = Math.abs(value);
+	    
+	    //TODO объем элемента при 1*1*0,15 размерах при разбиении 10 10 3
+	   /* double Ve = 1.5432098765432112E-4;
+	    double E = 2100000000;
+	    double U = 0.5*Ve*E*max*max;
+	    
+	    double c = 0.462;//TODO Warn
+	    double ro = 7850;
+	    double Cv = c*ro/**Ve*/;
+	    
+	    //double dT = (0.9*U)/Cv;*/
+	    //System.out.println(">> "+dT);
+	    
+	   // System.out.println("} "+ max*Ve);
+	    //5595173599385485E-5
+	    //0.00005595173599385485;
+	   // double dd = 3.9422688136438355E7
+	   // 39422.68813643836
+	    
+	    System.out.println(max);
 	    
 	    double step = (max - min) / 9.0f;
 	    int color = 0;
@@ -504,18 +541,47 @@ public class GLPainterHelper {
 	
 	private static int setColorStructal(GL2 gl, double value, StaticDeformationResult result) {
 		    //TODO Оптимизировать, без лишних пересчетов
-		    double min = result.getDeformations()[0].getZ(); 
-		    double max = result.getDeformations()[0].getZ();
+		    double min = Math.abs(result.getDeformations()[0].getZ()); 
+		    double max = Math.abs(result.getDeformations()[0].getZ());
 		    
 		    for(int i= 0;i<result.getDeformations().length;i++) {
-		      if(min> result.getDeformations()[i].getZ()) {
-		        min = result.getDeformations()[i].getZ();
+		      if(min> Math.abs(result.getDeformations()[i].getZ())) {
+		        min = Math.abs(result.getDeformations()[i].getZ());
 		      }
-		      if(max< result.getDeformations()[i].getZ()) {
-		        max = result.getDeformations()[i].getZ();
+		      if(max< Math.abs(result.getDeformations()[i].getZ())) {
+		        max = Math.abs(result.getDeformations()[i].getZ());
 		      }
 		    }
 		    
+		    value = Math.abs(value);
+		    //TODO удалить
+		   /*
+		    double mx = 0;
+		    double my = 0;
+		    double mz = 0;
+		    
+		    
+		    for(int i= 0;i<result.getDeformations().length;i++) {
+		      if(Math.abs(mx) < Math.abs(result.getDeformations()[i].getX())) {
+		    	  mx = result.getDeformations()[i].getX();
+		      }
+		      if(Math.abs(my) < Math.abs(result.getDeformations()[i].getY())) {
+		    	  my = result.getDeformations()[i].getY();
+			  }
+		      if(Math.abs(mz) < Math.abs(result.getDeformations()[i].getZ())) {
+		    	  mz = result.getDeformations()[i].getZ();
+			  }
+		    }
+		    
+		    System.out.println("-");
+		    System.out.println(mx);
+		    System.out.println(my);
+		    System.out.println(mz);
+		    System.out.println("e");
+		    */
+		    
+		    //TODO ~удалить
+		     
 		    double step = (max - min) / 9.0f;
 		    int color = 0;
 
