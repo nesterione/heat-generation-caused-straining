@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.plaf.DimensionUIResource;
 
 import by.nesterenya.fem.analysis.init.*;
-import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.boundary.ILoad;
@@ -226,7 +226,7 @@ public class STModeling implements ActionListener {
 				ThermalStaticAnalisis analysis = new ThermalStaticAnalisis();
 				analysis.setGeometry(box);
 				analysis.setMesh(mesh);
-				analysis.setDataInit(new DataInitThermalStatic(300));
+				analysis.setDataInit(new InitDataStaticThermal(300));
 				
 				List<ILoad> loads = new ArrayList<>();
 				loads.add(new StaticTemperature(400, analysis.getMesh().getBoundaries().get("левая")));
@@ -324,7 +324,7 @@ public class STModeling implements ActionListener {
 			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
-			glDisplay.setDisplayType(DisplayType.TEMPERATURE);
+			glDisplay.setDisplayType(DisplayType.DEFORMATION);
 			//glDisplay.setDisplayType(DisplayType.STRAIN);
 			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
 				

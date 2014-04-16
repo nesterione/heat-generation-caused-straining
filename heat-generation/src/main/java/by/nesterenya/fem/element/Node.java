@@ -5,7 +5,7 @@ package by.nesterenya.fem.element;
  * @author igor <br>
  *         Базовый интерфейс для узлов элемента
  */
-public interface INode {
+public interface Node {
 
   public enum Dim {
 

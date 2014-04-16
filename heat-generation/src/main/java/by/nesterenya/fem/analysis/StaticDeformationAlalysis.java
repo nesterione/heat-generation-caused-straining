@@ -2,7 +2,7 @@ package by.nesterenya.fem.analysis;
 
 import java.util.List;
 
-import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
@@ -35,12 +35,12 @@ public class StaticDeformationAlalysis extends Analysis {
 		this.loads = loads;
 	}
 
-	public StaticDeformationResult getResult() {
-		return (StaticDeformationResult)result;
+	public StaticStructuralResult getResult() {
+		return (StaticStructuralResult)result;
 	}
 
-	public void setResult(StaticDeformationResult result) {
-		this.result = (StaticDeformationResult) result;
+	public void setResult(StaticStructuralResult result) {
+		this.result = (StaticStructuralResult) result;
 	}
 
 	@Override

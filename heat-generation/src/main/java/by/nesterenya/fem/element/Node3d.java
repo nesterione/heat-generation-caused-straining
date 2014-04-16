@@ -4,7 +4,7 @@ package by.nesterenya.fem.element;
  * 
  * @author igor Клас реализующий трехмерный узел с тремя размерностями: X, Y, Z
  */
-public class Node3d implements INode {
+public class Node3d implements Node {
   final private static int DEMENTION = 3;
 
   private double x;

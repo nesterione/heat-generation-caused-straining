@@ -3,8 +3,8 @@ package by.nesterenya.fem.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
-import by.nesterenya.fem.analysis.init.IDataInit;
-import by.nesterenya.fem.analysis.result.IResult;
+import by.nesterenya.fem.analysis.init.InitData;
+import by.nesterenya.fem.analysis.result.Result;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.mesh.Mesh;
@@ -27,15 +27,15 @@ import by.nesterenya.fem.primitives.Box;
   protected IMesh mesh;
   
   
-  protected IDataInit dataInit;
+  protected InitData dataInit;
   
   //Результат исследования
-  protected IResult result;
+  protected Result result;
   
   public abstract List<ILoad> getLoads();
   public abstract Box getGeometry();
   public abstract IMesh getMesh();
-  public abstract IResult getResult();
+  public abstract Result getResult();
   
   //TODO этот метод суда не вписывается, подумать куда переместить
   //public abstract String getSelectedPlane();

@@ -1,13 +1,15 @@
 package by.nesterenya.fem.solver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import by.nesterenya.fem.analysis.Analysis;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.DeformationInNode;
-import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.analysis.result.Temperature;
@@ -15,8 +17,8 @@ import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
 import by.nesterenya.fem.element.IElement;
-import by.nesterenya.fem.element.INode;
-import by.nesterenya.fem.element.INode.Dim;
+import by.nesterenya.fem.element.Node;
+import by.nesterenya.fem.element.Node.Dim;
 import by.nesterenya.fem.element.material.Material;
 
 public class StaticDeformationSolver {
@@ -41,10 +43,10 @@ public class StaticDeformationSolver {
 
 		double[][] A = new double[12][12];
 
-		INode node0 = element.getNode(0);
-		INode node1 = element.getNode(1);
-		INode node2 = element.getNode(2);
-		INode node3 = element.getNode(3);
+		Node node0 = element.getNode(0);
+		Node node1 = element.getNode(1);
+		Node node2 = element.getNode(2);
+		Node node3 = element.getNode(3);
 		
 		int node_count = 4;
 		
@@ -187,10 +189,10 @@ public class StaticDeformationSolver {
 	final int DEGREES_OF_FREEDOM = 3;
 
 	private double calcVolumeOfElement(IElement element) throws Exception {
-		INode node0 = element.getNode(0);
-		INode node1 = element.getNode(1);
-		INode node2 = element.getNode(2);
-		INode node3 = element.getNode(3);
+		Node node0 = element.getNode(0);
+		Node node1 = element.getNode(1);
+		Node node2 = element.getNode(2);
+		Node node3 = element.getNode(3);
 		
 		double[][] md = {
 				{ 1, 
@@ -217,7 +219,7 @@ public class StaticDeformationSolver {
 	
 	public double[][] formGlobalK() throws Exception {
 		List<IElement> elements = analisis.getMesh().getElements();
-		List<INode> nodes = analisis.getMesh().getNodes();
+		List<Node> nodes = analisis.getMesh().getNodes();
 
 		double[][] Q = formMatrixQ();
 
@@ -296,8 +298,8 @@ public class StaticDeformationSolver {
 		}
 	}
 
-	private void fixNodes(double[][] gK, List<INode> fixedNodes) {
-		for (INode node : fixedNodes) {
+	private void fixNodes(double[][] gK, List<Node> fixedNodes) {
+		for (Node node : fixedNodes) {
 			int numberFixedNode = analisis.getMesh().getNodes()
 					.lastIndexOf(node);
 
@@ -322,7 +324,7 @@ public class StaticDeformationSolver {
 		
 		nodeLoad = nodeLoad/(distrubutedLoad.getBoundary().getNodes().size());
 		
-		for (INode node : distrubutedLoad.getBoundary().getNodes()) {
+		for (Node node : distrubutedLoad.getBoundary().getNodes()) {
 
 			// Значение должно прибовлятся к существующему, так как на некоторые
 			// узлы уже может быть
@@ -345,13 +347,21 @@ public class StaticDeformationSolver {
 		int nodeSize = analisis.getMesh().getNodes().size();
 		Deformation[] deformations = new Deformation[nodeSize];
 		
+		Map<Node, Deformation> deformation_test = new HashMap<>();
+		
 		for(int i = 0; i< nodeSize; i++) {
 			
 			double defX = R[i*DEGREES_OF_FREEDOM];
 			double defY = R[i*DEGREES_OF_FREEDOM + 1];
 			double defZ = R[i*DEGREES_OF_FREEDOM + 2];
 			
-			deformations[i] = new Deformation(defX, defY, defZ);
+			Deformation def = new Deformation(defX, defY, defZ);
+			
+			deformations[i] = def;
+			
+			//TODO : эксперементальная фича
+			Node node = analisis.getMesh().getNodes().get(i);
+			deformation_test.put(node, def);
 		}
 		
 		//Calculation of Strain
@@ -378,7 +388,7 @@ public class StaticDeformationSolver {
 			double[] curDeff = new double[DEGREES_OF_FREEDOM*COUNT_NODES_IN_ELEMENT];
 			
 			for(int i = 0; i < COUNT_NODES_IN_ELEMENT; i++) {
-				INode node = element.getNode(i);
+				Node node = element.getNode(i);
 				int nodeNumber = analisis.getMesh().getNodes().indexOf(node);
 				
 				curDeff[i*DEGREES_OF_FREEDOM] = deformations[nodeNumber].getX();
@@ -487,11 +497,10 @@ public class StaticDeformationSolver {
 					double nt = (temperatures[ind_sj].getValue() + dT)/2.0;
 					temperatures[ind_sj] = new Temperature(nt);
 				}
-				
 			}
 		}
-		
-		StaticDeformationResult result = new StaticDeformationResult(deformations, strains, strainEnergy);
+		//TODO убрать deformation_test
+		StaticStructuralResult result = new StaticStructuralResult(deformation_test, strains, strainEnergy);
 		result.setDeformationInNode(defInNodes);
 		result.setTemperatures(temperatures);
 		analisis.setResult(result);

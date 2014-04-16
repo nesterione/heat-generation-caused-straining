@@ -2,14 +2,14 @@ package by.nesterenya.fem.boundary;
 
 import java.util.List;
 
-import by.nesterenya.fem.element.INode;
+import by.nesterenya.fem.element.Node;
 
 public class Boundary {
   private String name;
-  private List<INode> nodes;
+  private List<Node> nodes;
   private double square;
   
-  public Boundary(String name, List<INode> nodes, double square) {
+  public Boundary(String name, List<Node> nodes, double square) {
     this.setName(name);
     this.setNodes(nodes);
     this.square = square;
@@ -23,11 +23,11 @@ public class Boundary {
     this.name = name;
   }
 
-  public List<INode> getNodes() {
+  public List<Node> getNodes() {
     return nodes;
   }
 
-  public void setNodes(List<INode> nodes) {
+  public void setNodes(List<Node> nodes) {
     this.nodes = nodes;
   }
   

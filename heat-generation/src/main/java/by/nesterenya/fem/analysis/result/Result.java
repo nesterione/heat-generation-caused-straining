@@ -1,5 +1,5 @@
 package by.nesterenya.fem.analysis.result;
 
-public interface IResult {
+public interface Result {
 
 }

@@ -1,10 +1,10 @@
 package by.nesterenya.fem.analysis.init;
 
-public class DataInitThermalStatic implements IDataInit {
+public class InitDataStaticThermal implements InitData {
  
   private double initialThemperature;
   
-  public DataInitThermalStatic(double initialThemperature) {
+  public InitDataStaticThermal(double initialThemperature) {
     setInitialThemperature(initialThemperature);
   }
   

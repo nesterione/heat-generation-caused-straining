@@ -14,18 +14,18 @@ import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.analysis.result.Deformation;
-import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.analysis.result.Temperature;
 import by.nesterenya.fem.element.*;
-import by.nesterenya.fem.element.INode.Dim;
+import by.nesterenya.fem.element.Node.Dim;
 import by.nesterenya.fem.primitives.Box;
 
 public class GLPainterHelper {
 	
 	// TODO Может быть переместить в лучшее место, может методы расширения
-	private static void drawGlVertex3d(GL2 gl,INode node) throws Exception {
+	private static void drawGlVertex3d(GL2 gl,Node node) throws Exception {
 	    gl.glVertex3d(node.getValueOfDemention(Dim.X), node.getValueOfDemention(Dim.Y),
 	        node.getValueOfDemention(Dim.Z));
 	  }
@@ -56,7 +56,7 @@ public class GLPainterHelper {
 	    gl.glBegin(GL.GL_POINTS);
 
 
-	    for (INode node : mesh.getNodes()) {
+	    for (Node node : mesh.getNodes()) {
 	      drawGlVertex3d(gl,node);
 	    }
 
@@ -72,10 +72,10 @@ public class GLPainterHelper {
 	    gl.glBegin(GL.GL_TRIANGLES);
 	    List<IElement> elements = mesh.getElements();
 	    for (IElement element : elements) {
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 
 	      drawGlVertex3d(gl,node0);
 	      drawGlVertex3d(gl,node1);
@@ -190,7 +190,7 @@ public class GLPainterHelper {
 
 	    gl.glBegin(GL.GL_POINTS);
 
-	    for (INode node : analysis.getMesh().getNodes()) {
+	    for (Node node : analysis.getMesh().getNodes()) {
 	      drawGlVertex3d(gl,node);
 	    }
 
@@ -203,10 +203,10 @@ public class GLPainterHelper {
 	    List<IElement> elements = analysis.getMesh().getElements();
 	    for (IElement element : elements) {
 	    
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 
 	      DrawGLColor3f(gl, node0, analysis);
 	      drawGlVertex3d(gl,node0);
@@ -282,10 +282,10 @@ public class GLPainterHelper {
 	    List<IElement> elements = analysis.getMesh().getElements();
 	    for (IElement element : elements) {
 
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 	     
 	      DrawGLColor3fStruct(gl, node0, analysis);
 	      drawGLVertex3d_deformation(gl, node0, analysis);
@@ -361,10 +361,10 @@ public class GLPainterHelper {
 	    List<IElement> elements = analysis.getMesh().getElements();
 	    for (IElement element : elements) {
 
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 	     
 	      
 	      //Strain for all element
@@ -433,10 +433,10 @@ public class GLPainterHelper {
 	    List<IElement> elements = analysis.getMesh().getElements();
 	    for (IElement element : elements) {
 
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 	     
 	      
 	      //Strain for all element
@@ -492,7 +492,7 @@ public class GLPainterHelper {
 		setColorStraining(gl, vectorOfDeformation, analysis.getResult());
 	}
 	
-	private static void DrawGLColor3fStrainInNode(GL2 gl, INode node, StaticDeformationAlalysis analysis) {
+	private static void DrawGLColor3fStrainInNode(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
 		int indexElement = analysis.getMesh().getNodes().indexOf(node);
 		
 		double v = analysis.getResult().getDeformationInNode()[indexElement].getValue();
@@ -503,24 +503,23 @@ public class GLPainterHelper {
 	
 	
 	// TODO Может быть переместить в лучшее место, может методы расширения а лучьше Dependesy Injecton
-	private static void drawGLVertex3d_deformation(GL2 gl, INode node, StaticDeformationAlalysis analysis) throws Exception {
+	private static void drawGLVertex3d_deformation(GL2 gl, Node node, StaticDeformationAlalysis analysis) throws Exception {
 		
-		int numberNode = analysis.getMesh().getNodes().lastIndexOf(node);
 		double x = node.getValueOfDemention(Dim.X);
 		double y = node.getValueOfDemention(Dim.Y);
 		double z = node.getValueOfDemention(Dim.Z);
 		
-		Deformation[] deformations = analysis.getResult().getDeformations();
-		double dx = deformations[numberNode].getX();
-		double dy = deformations[numberNode].getY();
-		double dz = deformations[numberNode].getZ();
+		StaticStructuralResult result = analysis.getResult();
+		double dx = result.getDeformation(node).getX();
+		double dy = result.getDeformation(node).getY();
+		double dz = result.getDeformation(node).getZ();
 		
 		gl.glVertex3d(x+dx, y+dy, z+dz);
 	}
 	
-	private static void DrawGLColor3fStruct(GL2 gl, INode node, StaticDeformationAlalysis analysis) {
-		int indexNode = analysis.getMesh().getNodes().lastIndexOf(node);
-		setColorStructal(gl, analysis.getResult().getDeformations()[indexNode].getZ(), analysis.getResult());
+	private static void DrawGLColor3fStruct(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
+		//TODO здесь учитываеться только Z
+		setColorStructal(gl, analysis.getResult().getDeformation(node).getZ(), analysis.getResult());
 	}
 	
 	private static double calcVL(Strain strain){
@@ -540,14 +539,14 @@ public class GLPainterHelper {
 		//return strain.getEx()+strain.getEy()+strain.getEz();
 	}
 	
-	private static int setColorStraining(GL2 gl, double value, StaticDeformationResult result) {
+	private static int setColorStraining(GL2 gl, double value, StaticStructuralResult result) {
 	    
 		Strain[] strains = result.getStrains();
 		//TODO Оптимизировать, без лишних пересчетов
 	    double min = Math.abs(calcVL(strains[0])); 
 	    double max = Math.abs(calcVL(strains[0]));
 	    
-	    for(int i= 0;i<result.getDeformations().length;i++) {
+	    for(int i= 0;i<result.getStrains().length ;i++) {
 	    	
 	    	double curValue = Math.abs(calcVL(strains[i]));
 	    	
@@ -557,7 +556,6 @@ public class GLPainterHelper {
 	      if(max< curValue) {
 	        max = curValue;
 	      }
-	      
 	    }
 	    
 	    value = Math.abs(value);
@@ -626,53 +624,14 @@ public class GLPainterHelper {
 	    return color;
 }
 	
-	private static void DrawGLColor3f(GL2 gl, INode node, ThermalStaticAnalisis analysis) {
+	private static void DrawGLColor3f(GL2 gl, Node node, ThermalStaticAnalisis analysis) {
 	    setColorThermal(gl, analysis.getResult().getT()[analysis.getMesh().getNodes().lastIndexOf(node)]);
 	}
 	
-	private static int setColorStructal(GL2 gl, double value, StaticDeformationResult result) {
-		    //TODO Оптимизировать, без лишних пересчетов
-		    double min = Math.abs(result.getDeformations()[0].getZ()); 
-		    double max = Math.abs(result.getDeformations()[0].getZ());
+	private static int setColorStructal(GL2 gl, double value, StaticStructuralResult result) {
+		    double min = result.getMinDeformation(); 
+		    double max = result.getMaxDeformation();
 		    
-		    for(int i= 0;i<result.getDeformations().length;i++) {
-		      if(min> Math.abs(result.getDeformations()[i].getZ())) {
-		        min = Math.abs(result.getDeformations()[i].getZ());
-		      }
-		      if(max< Math.abs(result.getDeformations()[i].getZ())) {
-		        max = Math.abs(result.getDeformations()[i].getZ());
-		      }
-		    }
-		    
-		    value = Math.abs(value);
-		    //TODO удалить
-		   /*
-		    double mx = 0;
-		    double my = 0;
-		    double mz = 0;
-		    
-		    
-		    for(int i= 0;i<result.getDeformations().length;i++) {
-		      if(Math.abs(mx) < Math.abs(result.getDeformations()[i].getX())) {
-		    	  mx = result.getDeformations()[i].getX();
-		      }
-		      if(Math.abs(my) < Math.abs(result.getDeformations()[i].getY())) {
-		    	  my = result.getDeformations()[i].getY();
-			  }
-		      if(Math.abs(mz) < Math.abs(result.getDeformations()[i].getZ())) {
-		    	  mz = result.getDeformations()[i].getZ();
-			  }
-		    }
-		    
-		    System.out.println("-");
-		    System.out.println(mx);
-		    System.out.println(my);
-		    System.out.println(mz);
-		    System.out.println("e");
-		    
-		    */
-		    //TODO ~удалить
-		     
 		    double step = (max - min) / 9.0f;
 		    int color = 0;
 
@@ -715,7 +674,6 @@ public class GLPainterHelper {
 		    }
 
 		    return color;
-		    
 	}
 	
 	private static int setColorThermal(GL2 gl, double value) {
@@ -805,10 +763,10 @@ public class GLPainterHelper {
 	    List<IElement> elements = analysis.getMesh().getElements();
 	    for (IElement element : elements) {
 
-	      INode node0 = element.getNode(0);
-	      INode node1 = element.getNode(1);
-	      INode node2 = element.getNode(2);
-	      INode node3 = element.getNode(3);
+	      Node node0 = element.getNode(0);
+	      Node node1 = element.getNode(1);
+	      Node node2 = element.getNode(2);
+	      Node node3 = element.getNode(3);
 	     
 	      //Strain for all element
 	      DrawGLColor3fEnergy(gl, element, analysis);
@@ -849,7 +807,7 @@ public class GLPainterHelper {
 	}
 	
 	
-private static int setColorEnergy(GL2 gl, double value, StaticDeformationResult result) {
+private static int setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
 	    
 		StrainEnergy[] strainEnergies = result.getStrainEnergy();
 		//TODO Оптимизировать, без лишних пересчетов
@@ -952,10 +910,10 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
     List<IElement> elements = analysis.getMesh().getElements();
     for (IElement element : elements) {
 
-      INode node0 = element.getNode(0);
-      INode node1 = element.getNode(1);
-      INode node2 = element.getNode(2);
-      INode node3 = element.getNode(3);
+      Node node0 = element.getNode(0);
+      Node node1 = element.getNode(1);
+      Node node2 = element.getNode(2);
+      Node node3 = element.getNode(3);
      
       
       //Strain for all element
@@ -998,7 +956,7 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
     gl.glFlush();
 }
 
-private static void DrawGLColor3fStructalTemperature(GL2 gl, INode node, StaticDeformationAlalysis analysis) {
+private static void DrawGLColor3fStructalTemperature(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
 	int indexElement = analysis.getMesh().getNodes().indexOf(node);
 	
 	double v = analysis.getResult().getTemperatures()[indexElement].getValue();
@@ -1006,7 +964,7 @@ private static void DrawGLColor3fStructalTemperature(GL2 gl, INode node, StaticD
 	setColorStructalTempereature(gl, v, analysis.getResult());
 }
 
-private static int setColorStructalTempereature(GL2 gl, double value, StaticDeformationResult result) {
+private static int setColorStructalTempereature(GL2 gl, double value, StaticStructuralResult result) {
     
 	Temperature[] temperatures = result.getTemperatures();
 	//TODO Оптимизировать, без лишних пересчетов

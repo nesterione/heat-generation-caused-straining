@@ -1,6 +1,6 @@
 package by.nesterenya.fem.analysis.result;
 
-public class StaticThermalResult implements IResult{
+public class StaticThermalResult implements Result{
   
 	private double T[];
 

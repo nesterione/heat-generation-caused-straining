@@ -11,5 +11,5 @@ import by.nesterenya.fem.element.material.*;
 public interface IElement {
 	public IMaterial getMatherial();
 	
-	INode getNode(int number) throws Exception;
+	Node getNode(int number) throws Exception;
 }

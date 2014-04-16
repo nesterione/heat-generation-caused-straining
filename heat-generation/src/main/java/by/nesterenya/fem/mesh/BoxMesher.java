@@ -7,7 +7,7 @@ import java.util.Map;
 
 import by.nesterenya.fem.boundary.Boundary;
 import by.nesterenya.fem.element.IElement;
-import by.nesterenya.fem.element.INode;
+import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node3d;
 import by.nesterenya.fem.element.Tet4n;
 import by.nesterenya.fem.element.material.IMaterial;
@@ -62,7 +62,7 @@ public class BoxMesher implements IMesher {
 	@Override
 	public IMesh formMesh() throws Exception {
 		Map<String, Boundary> boundaries = initBoundariesMap(getBox());
-		List<INode> nodes = new ArrayList<>();
+		List<Node> nodes = new ArrayList<>();
 		List<IElement> elements = new ArrayList<>();
 		Map<Integer, IMaterial> materials = new HashMap<>();
 
@@ -116,7 +116,7 @@ public class BoxMesher implements IMesher {
 				ox = 0;
 				for (int i = 0; i < nCntOX; i++, ox += stepOX) {
 
-					INode tempNode = new Node3d(ox, oy, oz);
+					Node tempNode = new Node3d(ox, oy, oz);
 
 					nodes.add(tempNode);
 					if (i == 0)
@@ -163,32 +163,32 @@ public class BoxMesher implements IMesher {
 					// Убрать длинные строки
 
 					// knip
-					elements.add(new Tet4n(0, new INode[] { nodes.get(n),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(n),
 							nodes.get(k), nodes.get(m), nodes.get(j) },
 							materials, 0));
 
 					// ijkm
-					elements.add(new Tet4n(0, new INode[] { nodes.get(m),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(m),
 							nodes.get(p), nodes.get(n), nodes.get(i) },
 							materials, 0));
 
 					// kmpj
-					elements.add(new Tet4n(0, new INode[] { nodes.get(n),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(n),
 							nodes.get(i), nodes.get(j), nodes.get(m) },
 							materials, 0));
 
 					// rsim
-					elements.add(new Tet4n(0, new INode[] { nodes.get(s),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(s),
 							nodes.get(r), nodes.get(p), nodes.get(i) },
 							materials, 0));
 
 					// mpir
-					elements.add(new Tet4n(0, new INode[] { nodes.get(i),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(i),
 							nodes.get(j), nodes.get(m), nodes.get(s) },
 							materials, 0));
 
 					// rjim
-					elements.add(new Tet4n(0, new INode[] { nodes.get(i),
+					elements.add(new Tet4n(0, new Node[] { nodes.get(i),
 							nodes.get(p), nodes.get(s), nodes.get(m) },
 							materials, 0));
 				}
@@ -219,25 +219,25 @@ public class BoxMesher implements IMesher {
 		// left x = 0
 		boundaries.put(
 				left,
-				new Boundary(left, new ArrayList<INode>(), box.getWidth()
+				new Boundary(left, new ArrayList<Node>(), box.getWidth()
 						* box.getHeight()));
 		// reght x = xLenght;
 		boundaries.put(right,
-				new Boundary(right, new ArrayList<INode>(), box.getWidth()
+				new Boundary(right, new ArrayList<Node>(), box.getWidth()
 						* box.getHeight()));
 
 		boundaries.put(
 				top,
-				new Boundary(top, new ArrayList<INode>(), box.getLenght()
+				new Boundary(top, new ArrayList<Node>(), box.getLenght()
 						* box.getWidth()));
 		boundaries.put(bottom,
-				new Boundary(bottom, new ArrayList<INode>(), box.getLenght()
+				new Boundary(bottom, new ArrayList<Node>(), box.getLenght()
 						* box.getWidth()));
 		boundaries.put(front,
-				new Boundary(front, new ArrayList<INode>(), box.getLenght()
+				new Boundary(front, new ArrayList<Node>(), box.getLenght()
 						* box.getHeight()));
 		boundaries.put(back,
-				new Boundary(back, new ArrayList<INode>(), box.getLenght()
+				new Boundary(back, new ArrayList<Node>(), box.getLenght()
 						* box.getHeight()));
 
 		return boundaries;

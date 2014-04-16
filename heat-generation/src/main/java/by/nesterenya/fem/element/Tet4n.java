@@ -11,9 +11,9 @@ public class Tet4n implements IElement {
   private int numberMaterial;
   private Map<Integer, IMaterial> materials;
   
-  private INode nodesNumber[];
+  private Node nodesNumber[];
 
-  public Tet4n(int materialId, INode nodesNumber[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
+  public Tet4n(int materialId, Node nodesNumber[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
     if(nodesNumber.length!=NODE_COUNT)
       throw new Exception("При создании элемента, передано недостаточное количество узлов");
     
@@ -36,7 +36,7 @@ public class Tet4n implements IElement {
   }
 
   @Override
-  public INode getNode(int number) throws Exception {
+  public Node getNode(int number) throws Exception {
     if(number <0||number>(NODE_COUNT-1))
       throw new Exception("Недопустимый номер узла");
     return nodesNumber[number];

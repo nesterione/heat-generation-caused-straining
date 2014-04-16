@@ -16,7 +16,7 @@ import javax.media.opengl.glu.GLU;
 
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
-import by.nesterenya.fem.analysis.result.StaticDeformationResult;
+import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
   
@@ -25,7 +25,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	//TODO сделать битовый вектор вместо этого перечисления
 	
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT, STRAIN, STRAIN_IN_NODES, ENERGY, TEMPERATURE
+	    MODEL, MESH, RESULT, MESHRESULT, DEFORMATION, STRAIN, STRAIN_IN_NODES, ENERGY, TEMPERATURE
 	  };
 	
 	private Box model;
@@ -106,7 +106,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	        case MESHRESULT:
 	          //plotMehResult();
 	          break;
-	        case MEH_RESULT:
+	        case DEFORMATION:
 	        	if(analysis_d!=null) {  GLPainterHelper.plotDeformationResult(gl, position, analysis_d); }
 	        	break;
 	        case STRAIN:

@@ -5,8 +5,8 @@ import by.nesterenya.fem.analysis.result.StaticThermalResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticTemperature;
 import by.nesterenya.fem.element.IElement;
-import by.nesterenya.fem.element.INode;
-import by.nesterenya.fem.element.INode.Dim;
+import by.nesterenya.fem.element.Node;
+import by.nesterenya.fem.element.Node.Dim;
 import by.nesterenya.fem.element.material.Material;
 
 /**
@@ -141,10 +141,10 @@ public class ThermalStaticSolver {
 																 */; i++) {
 
 			IElement element = analis.getMesh().getElements().get(i);
-			INode node0 = element.getNode(0);
-			INode node1 = element.getNode(1);
-			INode node2 = element.getNode(2);
-			INode node3 = element.getNode(3);
+			Node node0 = element.getNode(0);
+			Node node1 = element.getNode(1);
+			Node node2 = element.getNode(2);
+			Node node3 = element.getNode(3);
 
 			// TODO убрать эти грабли
 			double[][] H = formLocalMxH(node0.getValueOfDemention(Dim.X),
@@ -198,7 +198,7 @@ public class ThermalStaticSolver {
 		
 		// Init Fixed thermal on boundaries
 		for (ILoad boundary : analis.getLoads()) {
-			for (INode node : boundary.getBoundary().getNodes()) {
+			for (Node node : boundary.getBoundary().getNodes()) {
 
 				R[getGlobalNumberNode(node) * DEGREES_OF_FREEDOM] = ((StaticTemperature) boundary)
 						.getTemperature();
@@ -222,7 +222,7 @@ public class ThermalStaticSolver {
 		analis.setResult(new StaticThermalResult(T1));
 	}
 
-	private int getGlobalNumberNode(INode node) {
+	private int getGlobalNumberNode(Node node) {
 		// TODO добавить обработку ошибок
 		return analis.getMesh().getNodes().lastIndexOf(node);
 	}

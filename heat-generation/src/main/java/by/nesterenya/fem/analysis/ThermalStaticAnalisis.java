@@ -2,7 +2,7 @@ package by.nesterenya.fem.analysis;
 
 import java.util.List;
 
-import by.nesterenya.fem.analysis.init.DataInitThermalStatic;
+import by.nesterenya.fem.analysis.init.InitDataStaticThermal;
 import by.nesterenya.fem.analysis.result.StaticThermalResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.mesh.IMesh;
@@ -11,11 +11,11 @@ import by.nesterenya.fem.solver.ThermalStaticSolver;
 
 public class ThermalStaticAnalisis extends Analysis{
  
-  public DataInitThermalStatic getDataInit() {
-    return (DataInitThermalStatic) dataInit;
+  public InitDataStaticThermal getDataInit() {
+    return (InitDataStaticThermal) dataInit;
   }
   
-  public void setDataInit(DataInitThermalStatic initData) {
+  public void setDataInit(InitDataStaticThermal initData) {
     this.dataInit = initData;
   }
    

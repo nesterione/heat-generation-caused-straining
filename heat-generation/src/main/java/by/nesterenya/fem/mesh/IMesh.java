@@ -5,7 +5,7 @@ import java.util.Map;
 
 import by.nesterenya.fem.boundary.Boundary;
 import by.nesterenya.fem.element.IElement;
-import by.nesterenya.fem.element.INode;
+import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.material.IMaterial;
 
 public interface IMesh {
@@ -15,7 +15,7 @@ public interface IMesh {
 	//TODO продумать интерфейс для Boundary
 	public Map<String, Boundary> getBoundaries();
 
-	public List<INode> getNodes();
+	public List<Node> getNodes();
 
 	public List<IElement> getElements();
 }
