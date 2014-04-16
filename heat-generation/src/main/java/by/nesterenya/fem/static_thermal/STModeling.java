@@ -303,6 +303,7 @@ public class STModeling implements ActionListener {
 			
 			Material material = new Material();
 			material.setDensity(7850);
+			material.setSpecificHeatCapacity(462);
 			material.setName("sdf");
 			//material.setThermalConductivity(60.5);
 			//material.setSpecificHeatCapacity(434);
@@ -323,7 +324,7 @@ public class STModeling implements ActionListener {
 			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
-			glDisplay.setDisplayType(DisplayType.ENERGY);
+			glDisplay.setDisplayType(DisplayType.TEMPERATURE);
 			//glDisplay.setDisplayType(DisplayType.STRAIN);
 			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
 				

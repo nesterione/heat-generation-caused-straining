@@ -10,6 +10,7 @@ import by.nesterenya.fem.analysis.result.DeformationInNode;
 import by.nesterenya.fem.analysis.result.StaticDeformationResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
+import by.nesterenya.fem.analysis.result.Temperature;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
@@ -362,6 +363,7 @@ public class StaticDeformationSolver {
 		double[][] Q  = formMatrixQ();
 		
 		DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
+		Temperature[] temperatures = new Temperature[nodeSize];
 		
 		for (IElement element : elements) {
 			
@@ -459,12 +461,40 @@ public class StaticDeformationSolver {
 			double energy = MMath.MUL(dd,res)*0.5;
 			
 			strainEnergy[elemNumber] = new StrainEnergy(energy);
+		
+			
+			//
+			// Calculation Strain Temperature
+			//
+			double c = material.getSpecificHeatCapacity();
+			double ro = material.getDensity();
+			//TODO выяснить или нужент тут объем
+			double Cv = c*ro/**Ve*/;
+			
+			double dT = energy/Cv;
+			
+			
+			for(int i =0;i< COUNT_NODES; i++) {
+				
+				int ind_sj = analisis.getMesh().getNodes()
+						.lastIndexOf(element.getNode(i));
+				
+				
+				//если значение в узле нету
+				if(temperatures[ind_sj] == null) {
+					temperatures[ind_sj] = new Temperature(dT);
+				} else {
+					double nt = (temperatures[ind_sj].getValue() + dT)/2.0;
+					temperatures[ind_sj] = new Temperature(nt);
+				}
+				
+			}
 		}
 		
 		StaticDeformationResult result = new StaticDeformationResult(deformations, strains, strainEnergy);
 		result.setDeformationInNode(defInNodes);
+		result.setTemperatures(temperatures);
 		analisis.setResult(result);
-		
 	}
 
 	public double getResultX(int i) {

@@ -7,6 +7,7 @@ public class StaticDeformationResult implements IResult {
 	private Deformation[] deformations;
 	private Strain[] strains;
 	private StrainEnergy[] strainEnergy;
+	private Temperature[] temperatures;
 	
 	//TODO: подумать, может результат хранить для каждого элемента
 	
@@ -46,5 +47,13 @@ public class StaticDeformationResult implements IResult {
 
 	public void setStrainEnergy(StrainEnergy[] strainEnergy) {
 		this.strainEnergy = strainEnergy;
+	}
+
+	public Temperature[] getTemperatures() {
+		return temperatures;
+	}
+
+	public void setTemperatures(Temperature[] temperatures) {
+		this.temperatures = temperatures;
 	}
 }
