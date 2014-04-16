@@ -424,4 +424,27 @@ public class MMath
       }
       return result;
     }
+    
+    public static double MUL(double[] vectorA, double[] vectorB) {
+    	double result = 0;
+    	
+    	for(int i = 0; i< vectorA.length; i++) {
+    		result+= vectorA[i]*vectorB[i];
+    	}
+    	
+    	return result; 
+    }
+
+	public static double[] MUL(double[] res, double[][] A) {
+
+		double[] result = new double[res.length];
+		
+		for(int i =0;i<A[0].length;i++) {
+			for(int j = 0; j< res.length; j++) {
+				result[i] += res[j]*A[j][i];
+			}
+		}
+		
+		return result;
+	}
 }

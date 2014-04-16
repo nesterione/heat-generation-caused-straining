@@ -9,6 +9,7 @@ import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.DeformationInNode;
 import by.nesterenya.fem.analysis.result.StaticDeformationResult;
 import by.nesterenya.fem.analysis.result.Strain;
+import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
@@ -356,6 +357,7 @@ public class StaticDeformationSolver {
 		List<IElement> elements =  analisis.getMesh().getElements();
 		
 		Strain[] strains = new Strain[elements.size()];
+		StrainEnergy[] strainEnergy = new StrainEnergy[elements.size()];
 		
 		double[][] Q  = formMatrixQ();
 		
@@ -406,9 +408,60 @@ public class StaticDeformationSolver {
 				
 			}
 			
+			
+			//
+			// Calculation strain energy
+			//
+			
+			//double energyValue = 0.5 * Ve* E * e*e;
+			// или 0.5 * {res}^Т * [K] * {res}
+			//TODO переделать обязательно
+			int[] idx = new int[COUNT_NODES];
+			
+			idx[0] = analisis.getMesh().getNodes().indexOf(element.getNode(0));
+			idx[1] = analisis.getMesh().getNodes().indexOf(element.getNode(1));
+			idx[2] = analisis.getMesh().getNodes().indexOf(element.getNode(2));
+			idx[3] = analisis.getMesh().getNodes().indexOf(element.getNode(3));
+			
+			double[] res = new double[COUNT_NODES * DEGREES_OF_FREEDOM];		
+			for(int i =0;i< COUNT_NODES;i++) {
+				res[i*DEGREES_OF_FREEDOM] = deformations[idx[i]].getX();
+				res[i*DEGREES_OF_FREEDOM + 1] = deformations[idx[i]].getY();
+				res[i*DEGREES_OF_FREEDOM + 2] = deformations[idx[i]].getZ();
+			}
+			
+			
+			
+			//Формируем локальную матрицу жесткости
+			Material material = (Material) element.getMatherial();
+
+			// TODO WARM в параметрах
+			double[][] curE = formMatrixE(material.getElasticModulus(),
+					material.getPoissonsRatio());
+
+			// Формируем координатную матрицу для текущего элемента
+			double[][] AA = formMatrixA(element);
+					
+			double[][] BB = MMath.INV(AA);
+
+			double Ve = calcVolumeOfElement(element);
+
+			// Формирование локальной матрицы жесткости
+			double[][] KK;
+		    KK = MMath.MUL(MMath.T(BB), MMath.T(Q));
+			KK = MMath.MUL(KK, curE);
+			KK = MMath.MUL(KK, Q);
+			KK = MMath.MUL(KK, BB);
+			KK = MMath.MUL(KK, Ve);
+			
+			double[] dd = MMath.MUL(res, KK);
+			
+			double energy = MMath.MUL(dd,res)*0.5;
+			
+			strainEnergy[elemNumber] = new StrainEnergy(energy);
 		}
 		
-		StaticDeformationResult result = new StaticDeformationResult(deformations, strains);
+		StaticDeformationResult result = new StaticDeformationResult(deformations, strains, strainEnergy);
 		result.setDeformationInNode(defInNodes);
 		analisis.setResult(result);
 		

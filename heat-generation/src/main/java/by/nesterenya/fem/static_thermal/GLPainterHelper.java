@@ -16,6 +16,7 @@ import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.StaticDeformationResult;
 import by.nesterenya.fem.analysis.result.Strain;
+import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.element.*;
 import by.nesterenya.fem.element.INode.Dim;
 import by.nesterenya.fem.primitives.Box;
@@ -764,4 +765,155 @@ public class GLPainterHelper {
 
 	    return color;
 	  }
+
+	public static void plotStrainEnergyResult(GL2 gl, Position position,
+			StaticDeformationAlalysis analysis) throws Exception {
+	
+		gl.glTranslatef(0.0f, 0.0f, -6.0f);
+
+	    gl.glScaled(position.getZoom(), position.getZoom(), position.getZoom()); // screen
+
+	    // TODO изменить положение камеры правильным образом
+	    // gluLookAt(0.0, 0.0, 25.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+	    gl.glRotated(position.getAngle_x(), 0.0, 1.0, 0.0);
+	    gl.glRotated(position.getAngle_y(), 1.0, 0.0, 0.0);
+
+	    // Рисуем координатные оси
+	    GLPrimitives.drawCoordinateSystem(gl);
+
+	    gl.glTranslated(position.getMove_x(), position.getMove_y(), 0);
+
+	    gl.glEnable(GL2ES1.GL_ALPHA_TEST);
+	    gl.glEnable(GL.GL_BLEND);
+	    gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
+
+	    gl.glTranslatef(0, 0, 0.001f);
+	    gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+
+	    gl.glPointSize(4);
+	    gl.glEnable(GL2ES1.GL_POINT_SMOOTH); // включаем режим сглаживания точек
+
+	    gl.glEnd();
+
+	    gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
+
+	    gl.glBegin(GL.GL_TRIANGLES);
+	    List<IElement> elements = analysis.getMesh().getElements();
+	    for (IElement element : elements) {
+
+	      INode node0 = element.getNode(0);
+	      INode node1 = element.getNode(1);
+	      INode node2 = element.getNode(2);
+	      INode node3 = element.getNode(3);
+	     
+	      //Strain for all element
+	      DrawGLColor3fEnergy(gl, element, analysis);
+	      
+	      drawGLVertex3d_deformation(gl,node0, analysis);
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      drawGLVertex3d_deformation(gl,node2, analysis);
+
+	      drawGLVertex3d_deformation(gl,node0, analysis);
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+
+	      drawGLVertex3d_deformation(gl,node1, analysis);
+	      drawGLVertex3d_deformation(gl,node2, analysis);  
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+ 
+	      drawGLVertex3d_deformation(gl,node0, analysis);  
+	      drawGLVertex3d_deformation(gl,node2, analysis);
+	      drawGLVertex3d_deformation(gl,node3, analysis);
+	    }
+	    gl.glEnd();
+
+	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
+	    gl.glTranslatef(0, 0, -0.001f);
+
+	    gl.glDisable(GL.GL_BLEND);
+	    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
+	    gl.glFlush();
+	}
+
+	private static void DrawGLColor3fEnergy(GL2 gl, IElement element, StaticDeformationAlalysis analysis) {
+		int indexElement = analysis.getMesh().getElements().indexOf(element);
+		
+		StrainEnergy strainEnergy = analysis.getResult().getStrainEnergy()[indexElement];
+		
+		
+		setColorEnergy(gl, strainEnergy.getValue(), analysis.getResult());
+	}
+	
+	
+private static int setColorEnergy(GL2 gl, double value, StaticDeformationResult result) {
+	    
+		StrainEnergy[] strainEnergies = result.getStrainEnergy();
+		//TODO Оптимизировать, без лишних пересчетов
+	    double min = Math.abs(strainEnergies[0].getValue()); 
+	    double max = Math.abs(strainEnergies[0].getValue());
+	    
+	    for(int i= 0;i<result.getDeformations().length;i++) {
+	    	
+	      double curValue = Math.abs(strainEnergies[i].getValue());
+	    	
+	      if(min> curValue) {
+	        min = curValue;
+	      }
+	      if(max< curValue) {
+	        max = curValue;
+	      }
+	      
+	    }
+	    
+	    value = Math.abs(value);
+	        
+	    System.out.println("> "+max);
+	    
+	    double step = (max - min) / 9.0f;
+	    int color = 0;
+
+	    for (double st = min + step; color < 9; st += step, color++)
+	      if (value <= st) {
+	        break;
+	      }
+
+	    switch (color) {
+	      case 0:
+	        gl.glColor3f(0.0f, 0.0f, 1.0f); // синий
+	        break;
+	      case 1:
+	        gl.glColor3f(0.078f, 0.482f, 0.98f); // светлосиний
+	        break;
+	      case 2:
+	        gl.glColor3f(0.086f, 0.906f, 0.973f); // голубой
+	        break;
+	      case 3:
+	        gl.glColor3f(0.094f, 0.961f, 0.573f); // голубоватый
+	        break;
+	      case 4:
+	        gl.glColor3f(0.0f, 1.0f, 0.0f); // зелёный
+	        break;
+	      case 5:
+	        gl.glColor3f(0.62f, 0.984f, 0.075f); // зеленоватый
+	        break;
+	      case 6:
+	        gl.glColor3f(0.957f, 0.98f, 0.078f); // желтый
+	        break;
+	      case 7:
+	        gl.glColor3f(0.988f, 0.667f, 0.070f); // оранжевый
+	        break;
+	      case 8:
+	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
+	        break;
+	      default:
+	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
+	        break;
+	    }
+
+	    return color;
+}
+	
 }

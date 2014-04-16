@@ -22,8 +22,10 @@ import by.nesterenya.fem.primitives.Box;
   
 public class GlDisplay extends GLCanvas implements GLEventListener {
 
+	//TODO сделать битовый вектор вместо этого перечисления
+	
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT, STRAIN, STRAIN_IN_NODES
+	    MODEL, MESH, RESULT, MESHRESULT, MEH_RESULT, STRAIN, STRAIN_IN_NODES, ENERGY
 	  };
 	
 	private Box model;
@@ -111,10 +113,17 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	        	if(analysis_d!=null) {
 	        		GLPainterHelper.plotStrainResult(gl, position, analysis_d);
 	        	}
+	        	break;
 	        case STRAIN_IN_NODES:
 	        	if(analysis_d!=null) {
 	        		GLPainterHelper.plotStrainInNodesResult(gl, position, analysis_d);
 	        	}
+	        	break;
+	        case ENERGY:
+	        	if(analysis_d!=null) {
+	        		GLPainterHelper.plotStrainEnergyResult(gl, position, analysis_d);
+	        	}
+	        	break;
 	      }
 	    } catch (Exception e) {
 	      e.printStackTrace();

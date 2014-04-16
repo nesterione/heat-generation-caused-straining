@@ -6,10 +6,14 @@ public class StaticDeformationResult implements IResult {
 	private DeformationInNode[] deformationInNode;
 	private Deformation[] deformations;
 	private Strain[] strains;
+	private StrainEnergy[] strainEnergy;
 	
-	public StaticDeformationResult(Deformation[] deformations, Strain[] strains) {
+	//TODO: подумать, может результат хранить для каждого элемента
+	
+	public StaticDeformationResult(Deformation[] deformations, Strain[] strains, StrainEnergy[] strainEnergy) {
 		setDeformations(deformations);
 		setStrains(strains);
+		setStrainEnergy(strainEnergy);
 	}
 
 	public Deformation[] getDeformations() {
@@ -34,5 +38,13 @@ public class StaticDeformationResult implements IResult {
 
 	public void setDeformationInNode(DeformationInNode[] deformationInNode) {
 		this.deformationInNode = deformationInNode;
+	}
+
+	public StrainEnergy[] getStrainEnergy() {
+		return strainEnergy;
+	}
+
+	public void setStrainEnergy(StrainEnergy[] strainEnergy) {
+		this.strainEnergy = strainEnergy;
 	}
 }
