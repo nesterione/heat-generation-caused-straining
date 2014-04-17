@@ -171,10 +171,8 @@ public class ThermalStaticSolver {
 									.get(i);
 							// TODO Возможна ошибка при нахождении индекса в
 							// коллекции
-							int ind_si = analis.getMesh().getNodes()
-									.lastIndexOf(elem.getNode(si));
-							int ind_sj = analis.getMesh().getNodes()
-									.lastIndexOf(elem.getNode(sj));
+							int ind_si = elem.getNode(si).getGlobalIndex();
+							int ind_sj = elem.getNode(sj).getGlobalIndex();
 
 							gH[ind_si * DEGREES_OF_FREEDOM + ki][ind_sj
 									* DEGREES_OF_FREEDOM + kj] += H[si
@@ -200,14 +198,14 @@ public class ThermalStaticSolver {
 		for (ILoad boundary : analis.getLoads()) {
 			for (Node node : boundary.getBoundary().getNodes()) {
 
-				R[getGlobalNumberNode(node) * DEGREES_OF_FREEDOM] = ((StaticTemperature) boundary)
+				R[node.getGlobalIndex() * DEGREES_OF_FREEDOM] = ((StaticTemperature) boundary)
 						.getTemperature();
 
 				for (int ii = 0; ii < gH.length; ii++) {
-					gH[getGlobalNumberNode(node) * DEGREES_OF_FREEDOM][ii] = 0;
+					gH[node.getGlobalIndex() * DEGREES_OF_FREEDOM][ii] = 0;
 				}
 				
-				gH[getGlobalNumberNode(node) * DEGREES_OF_FREEDOM][getGlobalNumberNode(node)
+				gH[node.getGlobalIndex() * DEGREES_OF_FREEDOM][node.getGlobalIndex()
 						* DEGREES_OF_FREEDOM] = 1;
 			}
 		}
@@ -222,9 +220,5 @@ public class ThermalStaticSolver {
 		analis.setResult(new StaticThermalResult(T1));
 	}
 
-	private int getGlobalNumberNode(Node node) {
-		// TODO добавить обработку ошибок
-		return analis.getMesh().getNodes().lastIndexOf(node);
-	}
 
 }

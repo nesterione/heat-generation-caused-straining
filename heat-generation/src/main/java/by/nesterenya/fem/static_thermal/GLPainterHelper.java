@@ -482,7 +482,7 @@ public class GLPainterHelper {
 	//TODO проверить изменение растояния в у STREEs вектор изменения растояния между узлами
 	
 	private static void DrawGLColor3fStrain(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
-		int indexElement = analysis.getMesh().getElements().indexOf(element);
+		int indexElement = element.getGlobalIndex();
 		
 		Strain strain = analysis.getResult().getStrains()[indexElement];
 		
@@ -493,7 +493,7 @@ public class GLPainterHelper {
 	}
 	
 	private static void DrawGLColor3fStrainInNode(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
-		int indexElement = analysis.getMesh().getNodes().indexOf(node);
+		int indexElement = node.getGlobalIndex();
 		
 		double v = analysis.getResult().getDeformationInNode()[indexElement].getValue();
 		
@@ -625,7 +625,7 @@ public class GLPainterHelper {
 }
 	
 	private static void DrawGLColor3f(GL2 gl, Node node, ThermalStaticAnalisis analysis) {
-	    setColorThermal(gl, analysis.getResult().getT()[analysis.getMesh().getNodes().lastIndexOf(node)]);
+	    setColorThermal(gl, analysis.getResult().getT()[node.getGlobalIndex()]);
 	}
 	
 	private static int setColorStructal(GL2 gl, double value, StaticStructuralResult result) {
@@ -798,7 +798,7 @@ public class GLPainterHelper {
 	}
 
 	private static void DrawGLColor3fEnergy(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
-		int indexElement = analysis.getMesh().getElements().indexOf(element);
+		int indexElement = element.getGlobalIndex();
 		
 		StrainEnergy strainEnergy = analysis.getResult().getStrainEnergy()[indexElement];
 		
@@ -957,7 +957,7 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
 }
 
 private static void DrawGLColor3fStructalTemperature(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
-	int indexElement = analysis.getMesh().getNodes().indexOf(node);
+	int indexElement = node.getGlobalIndex();
 	
 	double v = analysis.getResult().getTemperatures()[indexElement].getValue();
 	

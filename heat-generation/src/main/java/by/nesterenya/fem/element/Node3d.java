@@ -10,8 +10,11 @@ public class Node3d implements Node {
   private double x;
   private double y;
   private double z;
+  private int globalIndex;
 
-  public Node3d(double x, double y, double z) {
+  public Node3d(int globalIndex, double x, double y, double z) {
+	
+	this.globalIndex = globalIndex;
     this.setX(x);
     this.setY(y);
     this.setZ(z);
@@ -58,5 +61,10 @@ public class Node3d implements Node {
 
   public void setZ(double z) {
     this.z = z;
+  }
+
+  @Override
+  public int getGlobalIndex() {
+    return globalIndex;
   }
 }

@@ -30,4 +30,6 @@ public interface Node {
    * @return разменость узла
    */
   int getDemention();
+  
+  int getGlobalIndex();
 }

@@ -22,6 +22,17 @@ import static by.nesterenya.fem.solver.MMath.*;
 
 public class StaticDeformationSolver {
 	
+	/**
+	 * Count nodes in element
+	 */
+	private final static int COUNT_NODES = 4;
+	
+	/**
+	 * Degrees of freedom
+	 * In this problem is three.Stress along x, y and z
+	 */
+	private final static int DEGREES_OF_FREEDOM = 3;
+	
 	private StaticDeformationAlalysis analysis;
 
 	public StaticDeformationSolver(StaticDeformationAlalysis analysis) {
@@ -172,134 +183,97 @@ public class StaticDeformationSolver {
 		return K;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	// / <summary>
-	// / Вектор нагрузок
-	// / </summary>
-	private double[] R;
-
-	double k;
-
-	// / <summary>
-	// / Количество узлов в элементе
-	// / </summary>
-	final int COUNT_NODES = 4;
-
-	/**
-	 * Degrees of freedom
-	 * In this problem is three.Stress along x, y and z
-	 */
-	final int DEGREES_OF_FREEDOM = 3;
-
 	public double[][] formGlobalK() throws Exception {
 		List<Element> elements = analysis.getMesh().getElements();
 		int nodesCount = analysis.getMesh().getNodes().size();
-		
+		int dimentionGK = nodesCount * DEGREES_OF_FREEDOM;
 		// Initialization Global Stiffness Matrix 
-		double[][] gK = new double[nodesCount * DEGREES_OF_FREEDOM][nodesCount * DEGREES_OF_FREEDOM];
+		double[][] gK = new double[dimentionGK][dimentionGK];
 		
-		R = new double[gK.length];
-
 		// For each element do ...
 		for (Element element : elements) {
 			
 			double[][] K = formLocalK(element);
 
-			// Записуем текущую локальную матрицу в глобальную
+			// Add current local matrix to global
+			
 			for (int si = 0; si < COUNT_NODES; si++)
 				for (int sj = 0; sj < COUNT_NODES; sj++)
 					for (int ki = 0; ki < DEGREES_OF_FREEDOM; ki++)
 						for (int kj = 0; kj < DEGREES_OF_FREEDOM; kj++) {
-
-							// TODO Возможна ошибка при нахождении индекса в
-							// коллекции
-							int ind_si = analysis.getMesh().getNodes()
-									.lastIndexOf(element.getNode(si));
-							int ind_sj = analysis.getMesh().getNodes()
-									.lastIndexOf(element.getNode(sj));
-
-							gK[ind_si * DEGREES_OF_FREEDOM + ki][ind_sj
-									* DEGREES_OF_FREEDOM + kj] += K[si
-									* DEGREES_OF_FREEDOM + ki][sj
-									* DEGREES_OF_FREEDOM + kj];
-
-							// gK[elements[i].uz[si] * 3 + ki,
-							// elements[i].uz[sj] * 3 + kj] += K[si * 3 + ki, sj
-							// *
-							// 3 + kj];
+							
+							int gSi = element.getNode(si).getGlobalIndex();
+							int gSj = element.getNode(sj).getGlobalIndex();
+							int gI = gSi * DEGREES_OF_FREEDOM + ki;
+							int gJ = gSj * DEGREES_OF_FREEDOM + kj;
+							int locI = si * DEGREES_OF_FREEDOM + ki;
+							int locJ = sj * DEGREES_OF_FREEDOM + kj;
+							
+							gK[gI][gJ] += K[locI][locJ];
 						}
 		}
 		
 		return gK;
 	}
 
-	public void setBoundaries(double[][] gK) throws Exception {
+	public void setBoundaries(double[][] gK, double[] R) throws Exception {
 
-		// Важно чтобы фиксация происходила после указания нагрузок
+		// It's important to Fix Support past adding all loads
 		for (ILoad load : analysis.getLoads()) {
 			if (load instanceof StaticEvenlyDistributedLoad) {
-				addLoad((StaticEvenlyDistributedLoad) load);
+				addLoad((StaticEvenlyDistributedLoad) load, R);
 			}
 		}
 
-		// Фиксируем грани
+		// Fix support
 		for (ILoad load : analysis.getLoads()) {
 			if (load instanceof Support) {
-				fixNodes(gK, load.getBoundary().getNodes());
+				fixNodes(gK, R, load.getBoundary().getNodes());
 			}
 		}
 	}
 
-	private void fixNodes(double[][] gK, List<Node> fixedNodes) {
+	private void fixNodes(double[][] gK, double[] R, List<Node> fixedNodes) {
 		for (Node node : fixedNodes) {
-			int numberFixedNode = analysis.getMesh().getNodes()
-					.lastIndexOf(node);
-
-			for (int j = 0; j < 3; j++) {
-				for (int kk = 0; kk < gK.length; kk++) {
-					gK[numberFixedNode * 3 + j][kk] = 0;
-					gK[kk][numberFixedNode * 3 + j] = 0;
+			
+			int idx = node.getGlobalIndex();
+			for (int j = 0; j < DEGREES_OF_FREEDOM; j++) {
+				
+				// global index in matrix gK
+				int gIdx = idx * DEGREES_OF_FREEDOM + j;
+				for (int k = 0; k < gK.length; k++) {
+					gK[gIdx][k] = 0;
+					gK[k][gIdx] = 0;
 				}
-
-				R[numberFixedNode * 3 + j] = 0;
-				gK[numberFixedNode * 3 + j][numberFixedNode * 3 + j] = 1;
+				R[gIdx] = 0;
+				gK[gIdx][gIdx] = 1;
 			}
 		}
 	}
 
-	private void addLoad(StaticEvenlyDistributedLoad distrubutedLoad) throws Exception {
+	private void addLoad(StaticEvenlyDistributedLoad distributedLoad, double[] R) throws Exception {
 		
-		//Улучшенный вариант задания равномерно-распределеннной нагрузки
+		//It's not best method to adding distributed load
+		double loadOnSquare = distributedLoad.getLoad()/distributedLoad.getSquare();
+		List<Node> loadedNodes = distributedLoad.getBoundary().getNodes();
+		double loadOnEachNode = loadOnSquare/(loadedNodes.size());
 		
-		double nodeLoad = distrubutedLoad.getLoad()
-				/ distrubutedLoad.getSquare();
-		
-		nodeLoad = nodeLoad/(distrubutedLoad.getBoundary().getNodes().size());
-		
-		for (Node node : distrubutedLoad.getBoundary().getNodes()) {
-
-			// Значение должно прибовлятся к существующему, так как на некоторые
-			// узлы уже может быть
-			// оказана нагрузка
-			R[(analysis.getMesh().getNodes().lastIndexOf(node) * DEGREES_OF_FREEDOM) + 2] += nodeLoad;
+		//TODO still load added only on Z axis, it's bad, add direction in class StaticEvenlyDistributedLoad
+		for (Node node : loadedNodes) {
+			R[(node.getGlobalIndex() * DEGREES_OF_FREEDOM) + 2] += loadOnEachNode;
 		}
 	}
 
-	//TODO Убрать из глобальных переменных R
+	// TODO Error
 	
 	public void Solve() throws Exception {
 		double[][] gK = formGlobalK();
-		setBoundaries(gK);
+		double[] RR = new double[gK.length];
 		
+		setBoundaries(gK, RR);
 		
 		//Calculation of Deformation 
-		R = gausSLAU(gK, R);
+		double[] R = gausSLAU(gK, RR);
 		
 		//form deformation result
 		int nodeSize = analysis.getMesh().getNodes().size();
@@ -347,7 +321,7 @@ public class StaticDeformationSolver {
 			
 			for(int i = 0; i < COUNT_NODES_IN_ELEMENT; i++) {
 				Node node = element.getNode(i);
-				int nodeNumber = analysis.getMesh().getNodes().indexOf(node);
+				int nodeNumber = node.getGlobalIndex();
 				
 				curDeff[i*DEGREES_OF_FREEDOM] = deformations[nodeNumber].getX();
 				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations[nodeNumber].getY();
@@ -356,15 +330,14 @@ public class StaticDeformationSolver {
 		
 			double[] e_e = MUL(QQ, curDeff);
 			
-			int elemNumber = analysis.getMesh().getElements().indexOf(element);
+			int elemNumber = element.getGlobalIndex();
 			
 			strains[elemNumber] = new Strain(e_e[0], e_e[1], e_e[2], e_e[3], e_e[4], e_e[5]);
 		
 		
 			//form values of ecvivalent of deformation in nodes
 			for(int i =0;i< COUNT_NODES; i++) {
-				int ind_sj = analysis.getMesh().getNodes()
-						.lastIndexOf(element.getNode(i));
+				int ind_sj = element.getNode(i).getGlobalIndex();
 				
 				double eInNode = e_e[0]+e_e[1]+e_e[2];
 				
@@ -388,10 +361,10 @@ public class StaticDeformationSolver {
 			//TODO переделать обязательно
 			int[] idx = new int[COUNT_NODES];
 			
-			idx[0] = analysis.getMesh().getNodes().indexOf(element.getNode(0));
-			idx[1] = analysis.getMesh().getNodes().indexOf(element.getNode(1));
-			idx[2] = analysis.getMesh().getNodes().indexOf(element.getNode(2));
-			idx[3] = analysis.getMesh().getNodes().indexOf(element.getNode(3));
+			idx[0] = element.getNode(0).getGlobalIndex();
+			idx[1] = element.getNode(1).getGlobalIndex();
+			idx[2] = element.getNode(2).getGlobalIndex();
+			idx[3] = element.getNode(3).getGlobalIndex();
 			
 			double[] res = new double[COUNT_NODES * DEGREES_OF_FREEDOM];		
 			for(int i =0;i< COUNT_NODES;i++) {
@@ -444,8 +417,7 @@ public class StaticDeformationSolver {
 			
 			for(int i =0;i< COUNT_NODES; i++) {
 				
-				int ind_sj = analysis.getMesh().getNodes()
-						.lastIndexOf(element.getNode(i));
+				int ind_sj = element.getNode(i).getGlobalIndex();
 				
 				
 				//если значение в узле нету
@@ -462,18 +434,5 @@ public class StaticDeformationSolver {
 		result.setDeformationInNode(defInNodes);
 		result.setTemperatures(temperatures);
 		analysis.setResult(result);
-	}
-
-	public double getResultX(int i) {
-
-		return R[i * DEGREES_OF_FREEDOM];
-	}
-
-	public double getResultY(int i) {
-		return R[i * DEGREES_OF_FREEDOM + 1];
-	}
-
-	public double getResultZ(int i) {
-		return R[i * DEGREES_OF_FREEDOM + 2];
 	}
 }

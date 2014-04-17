@@ -109,14 +109,15 @@ public class BoxMesher implements IMesher {
 
 		double ox = 0, oy = 0, oz = 0;
 
+		int counter = 0;
 		// цикл по OZ
 		for (int k = 0; k < nCntOZ; k++, oz += stepOZ) {
 			oy = 0;
 			for (int j = 0; j < nCntOY; j++, oy += stepOY) {
 				ox = 0;
 				for (int i = 0; i < nCntOX; i++, ox += stepOX) {
-
-					Node tempNode = new Node3d(ox, oy, oz);
+					
+					Node tempNode = new Node3d(counter++,ox, oy, oz);
 
 					nodes.add(tempNode);
 					if (i == 0)
@@ -144,6 +145,7 @@ public class BoxMesher implements IMesher {
 		// m: cntSloi * (iz+1) + (iy+1) * nCntOX + (ix+1)
 		// k: cntSloi * (iz+1) + (iy+1) * nCntOX + ix
 
+		counter = 0;
 		for (int iz = 0; iz < nCntOZ - 1; iz++)
 			for (int iy = 0; iy < nCntOY - 1; iy++) {
 				for (int ix = 0; ix < nCntOX - 1; ix++) {
@@ -163,32 +165,32 @@ public class BoxMesher implements IMesher {
 					// Убрать длинные строки
 
 					// knip
-					elements.add(new Tet4n(0, new Node[] { nodes.get(n),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(n),
 							nodes.get(k), nodes.get(m), nodes.get(j) },
 							materials, 0));
 
 					// ijkm
-					elements.add(new Tet4n(0, new Node[] { nodes.get(m),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(m),
 							nodes.get(p), nodes.get(n), nodes.get(i) },
 							materials, 0));
 
 					// kmpj
-					elements.add(new Tet4n(0, new Node[] { nodes.get(n),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(n),
 							nodes.get(i), nodes.get(j), nodes.get(m) },
 							materials, 0));
 
 					// rsim
-					elements.add(new Tet4n(0, new Node[] { nodes.get(s),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(s),
 							nodes.get(r), nodes.get(p), nodes.get(i) },
 							materials, 0));
 
 					// mpir
-					elements.add(new Tet4n(0, new Node[] { nodes.get(i),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(i),
 							nodes.get(j), nodes.get(m), nodes.get(s) },
 							materials, 0));
 
 					// rjim
-					elements.add(new Tet4n(0, new Node[] { nodes.get(i),
+					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(i),
 							nodes.get(p), nodes.get(s), nodes.get(m) },
 							materials, 0));
 				}

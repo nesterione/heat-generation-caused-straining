@@ -14,5 +14,6 @@ public interface Element {
 	IMaterial getMatherial();
 	Node getNode(int number) throws Exception;
 	
+	int getGlobalIndex();
 	double getVolume();
 }

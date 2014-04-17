@@ -11,15 +11,17 @@ public class Tet4n implements Element {
 
   private final static int NODE_COUNT = 4;
 
+  //TODO хранить не номер материала а ссылку, может быть, подумать
   private int numberMaterial;
   private Map<Integer, IMaterial> materials;
-  
   private Node nodes[];
-
-  public Tet4n(int materialId, Node nodes[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
+  private int globalIndex;
+  
+  public Tet4n(int globalIndex, int materialId, Node nodes[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
     if(nodes.length!=NODE_COUNT)
       throw new Exception("При создании элемента, передано недостаточное количество узлов");
     
+    this.globalIndex = globalIndex;
     this.nodes = nodes;
     this.materials = materials;
     this.numberMaterial = numberMaterial;
@@ -52,7 +54,11 @@ public double getVolume() {
 	double Ve = Math.abs(DET(md)) / 6.0;
 	
 	return Ve;
-}
+  }
 
-  //TODO ищменить название numberNode
+  @Override
+  public int getGlobalIndex() {
+	return globalIndex;
+  }
+  
 }
