@@ -263,38 +263,41 @@ public class StaticDeformationSolver {
 			R[(node.getGlobalIndex() * DEGREES_OF_FREEDOM) + 2] += loadOnEachNode;
 		}
 	}
-
-	// TODO Error
+	
+	private Map<Node, Deformation> evaluateDeformationResult(double[] result) {
+		
+		Map<Node, Deformation> deformations = new HashMap<>();
+		int dodesCount = analysis.getMesh().getNodes().size();
+		
+		for(int i = 0; i< dodesCount; i++) {	
+			double defX = result[i*DEGREES_OF_FREEDOM];
+			double defY = result[i*DEGREES_OF_FREEDOM + 1];
+			double defZ = result[i*DEGREES_OF_FREEDOM + 2];
+					
+			Deformation def = new Deformation(defX, defY, defZ);
+					
+			Node node = analysis.getMesh().getNodes().get(i);
+			deformations.put(node, def);
+		}
+		
+		return deformations;
+	}
 	
 	public void Solve() throws Exception {
-		double[][] gK = formGlobalK();
-		double[] RR = new double[gK.length];
 		
-		setBoundaries(gK, RR);
+		double[][] gK = formGlobalK();
+		double[] R = new double[gK.length];
+		setBoundaries(gK, R);
 		
 		//Calculation of Deformation 
-		double[] R = gausSLAU(gK, RR);
+		double[] result = gausSLAU(gK, R);
+				
+		Map<Node, Deformation> deformations = evaluateDeformationResult(result);
 		
-		//form deformation result
+		
+		
+		
 		int nodeSize = analysis.getMesh().getNodes().size();
-		Deformation[] deformations = new Deformation[nodeSize];
-		
-		Map<Node, Deformation> deformation_test = new HashMap<>();
-		
-		for(int i = 0; i< nodeSize; i++) {
-			
-			double defX = R[i*DEGREES_OF_FREEDOM];
-			double defY = R[i*DEGREES_OF_FREEDOM + 1];
-			double defZ = R[i*DEGREES_OF_FREEDOM + 2];
-			
-			Deformation def = new Deformation(defX, defY, defZ);
-			
-			deformations[i] = def;
-			
-			//TODO : эксперементальная фича
-			Node node = analysis.getMesh().getNodes().get(i);
-			deformation_test.put(node, def);
-		}
 		
 		//Calculation of Strain
 		List<Element> elements =  analysis.getMesh().getElements();
@@ -323,9 +326,9 @@ public class StaticDeformationSolver {
 				Node node = element.getNode(i);
 				int nodeNumber = node.getGlobalIndex();
 				
-				curDeff[i*DEGREES_OF_FREEDOM] = deformations[nodeNumber].getX();
-				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations[nodeNumber].getY();
-				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations[nodeNumber].getZ();
+				curDeff[i*DEGREES_OF_FREEDOM] = deformations.get(node).getX();
+				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations.get(node).getY();
+				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations.get(node).getZ();
 			}
 		
 			double[] e_e = MUL(QQ, curDeff);
@@ -351,26 +354,18 @@ public class StaticDeformationSolver {
 				
 			}
 			
-			
 			//
 			// Calculation strain energy
 			//
 			
 			//double energyValue = 0.5 * Ve* E * e*e;
 			// или 0.5 * {res}^Т * [K] * {res}
-			//TODO переделать обязательно
-			int[] idx = new int[COUNT_NODES];
-			
-			idx[0] = element.getNode(0).getGlobalIndex();
-			idx[1] = element.getNode(1).getGlobalIndex();
-			idx[2] = element.getNode(2).getGlobalIndex();
-			idx[3] = element.getNode(3).getGlobalIndex();
-			
+				
 			double[] res = new double[COUNT_NODES * DEGREES_OF_FREEDOM];		
 			for(int i =0;i< COUNT_NODES;i++) {
-				res[i*DEGREES_OF_FREEDOM] = deformations[idx[i]].getX();
-				res[i*DEGREES_OF_FREEDOM + 1] = deformations[idx[i]].getY();
-				res[i*DEGREES_OF_FREEDOM + 2] = deformations[idx[i]].getZ();
+				res[i*DEGREES_OF_FREEDOM] = deformations.get(element.getNode(i)).getX();
+				res[i*DEGREES_OF_FREEDOM + 1] = deformations.get(element.getNode(i)).getY();
+				res[i*DEGREES_OF_FREEDOM + 2] = deformations.get(element.getNode(i)).getZ();
 			}
 			
 			
@@ -429,10 +424,10 @@ public class StaticDeformationSolver {
 				}
 			}
 		}
-		//TODO убрать deformation_test
-		StaticStructuralResult result = new StaticStructuralResult(deformation_test, strains, strainEnergy);
-		result.setDeformationInNode(defInNodes);
-		result.setTemperatures(temperatures);
-		analysis.setResult(result);
+		
+		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergy);
+		res.setDeformationInNode(defInNodes);
+		res.setTemperatures(temperatures);
+		analysis.setResult(res);
 	}
 }
