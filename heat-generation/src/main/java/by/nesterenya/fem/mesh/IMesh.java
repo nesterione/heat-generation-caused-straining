@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import by.nesterenya.fem.boundary.Boundary;
-import by.nesterenya.fem.element.IElement;
+import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.material.IMaterial;
 
@@ -17,5 +17,5 @@ public interface IMesh {
 
 	public List<Node> getNodes();
 
-	public List<IElement> getElements();
+	public List<Element> getElements();
 }

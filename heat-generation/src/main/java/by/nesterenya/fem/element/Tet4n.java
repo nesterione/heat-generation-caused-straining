@@ -1,35 +1,30 @@
 package by.nesterenya.fem.element;
 
+import static by.nesterenya.fem.solver.MMath.DET;
+
 import java.util.Map;
 
+import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.element.material.IMaterial;
 
-public class Tet4n implements IElement {
+public class Tet4n implements Element {
 
   private final static int NODE_COUNT = 4;
 
   private int numberMaterial;
   private Map<Integer, IMaterial> materials;
   
-  private Node nodesNumber[];
+  private Node nodes[];
 
-  public Tet4n(int materialId, Node nodesNumber[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
-    if(nodesNumber.length!=NODE_COUNT)
+  public Tet4n(int materialId, Node nodes[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
+    if(nodes.length!=NODE_COUNT)
       throw new Exception("При создании элемента, передано недостаточное количество узлов");
     
-    //TODO перейменовать
-    this.nodesNumber = nodesNumber;
+    this.nodes = nodes;
     this.materials = materials;
     this.numberMaterial = numberMaterial;
   }
 
-  /*public INode getNode(int numberNode) {
-    if(numberNode <0||numberNode>(NODE_COUNT-1))
-      throw new Exception("Недопустимый номер узла");
-    
-    //return 
-  }
-  */
   @Override
   public IMaterial getMatherial() {
     return materials.get(numberMaterial);
@@ -39,8 +34,25 @@ public class Tet4n implements IElement {
   public Node getNode(int number) throws Exception {
     if(number <0||number>(NODE_COUNT-1))
       throw new Exception("Недопустимый номер узла");
-    return nodesNumber[number];
+    return nodes[number];
   }
+
+@Override
+public double getVolume() {
+	
+	double[][] md = new double[4][4];
+	
+	for(int i = 0; i < NODE_COUNT; i++) {
+		md[i][0] = 1;
+		md[i][1] = nodes[i].getPosition(Axis.X);
+		md[i][2] = nodes[i].getPosition(Axis.Y);
+		md[i][3] = nodes[i].getPosition(Axis.Z);
+	}
+	
+	double Ve = Math.abs(DET(md)) / 6.0;
+	
+	return Ve;
+}
 
   //TODO ищменить название numberNode
 }

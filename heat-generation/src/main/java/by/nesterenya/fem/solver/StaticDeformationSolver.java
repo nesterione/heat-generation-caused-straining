@@ -1,11 +1,9 @@
 package by.nesterenya.fem.solver;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import by.nesterenya.fem.analysis.Analysis;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.DeformationInNode;
@@ -16,30 +14,26 @@ import by.nesterenya.fem.analysis.result.Temperature;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
-import by.nesterenya.fem.element.IElement;
+import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
-import by.nesterenya.fem.element.Node.Dim;
+import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.element.material.Material;
+import static by.nesterenya.fem.solver.MMath.*;
 
 public class StaticDeformationSolver {
-	// TODO F = A*sin(w*t)
-	private StaticDeformationAlalysis analisis;
+	
+	private StaticDeformationAlalysis analysis;
 
-	public StaticDeformationSolver(StaticDeformationAlalysis analisis) {
-		this.analisis = analisis;
+	public StaticDeformationSolver(StaticDeformationAlalysis analysis) {
+		this.analysis = analysis;
 	}
-
-	// private const int RANK_LOKAL_H = 4;
-
-	// инвертированная координатная матрица
-	double[][] B;
 
 	/**
 	 * Form cord matrix for current element
 	 * @throws Exception 
 	 * 
 	 */
-	public double[][] formMatrixA(IElement element) throws Exception {
+	private double[][] formMatrixA(Element element) throws Exception {
 
 		double[][] A = new double[12][12];
 
@@ -51,22 +45,22 @@ public class StaticDeformationSolver {
 		int node_count = 4;
 		
 		double[] kX = new double[node_count];
-		kX[0] = node0.getValueOfDemention(Dim.X);
-		kX[1] = node1.getValueOfDemention(Dim.X);
-		kX[2] = node2.getValueOfDemention(Dim.X);
-		kX[3] = node3.getValueOfDemention(Dim.X);
+		kX[0] = node0.getPosition(Axis.X);
+		kX[1] = node1.getPosition(Axis.X);
+		kX[2] = node2.getPosition(Axis.X);
+		kX[3] = node3.getPosition(Axis.X);
 		
 		double[] kY = new double[node_count];
-		kY[0] = node0.getValueOfDemention(Dim.Y);
-		kY[1] = node1.getValueOfDemention(Dim.Y);
-		kY[2] = node2.getValueOfDemention(Dim.Y);
-		kY[3] = node3.getValueOfDemention(Dim.Y);
+		kY[0] = node0.getPosition(Axis.Y);
+		kY[1] = node1.getPosition(Axis.Y);
+		kY[2] = node2.getPosition(Axis.Y);
+		kY[3] = node3.getPosition(Axis.Y);
 		
 		double[] kZ = new double[node_count];
-		kZ[0] = node0.getValueOfDemention(Dim.Z);
-		kZ[1] = node1.getValueOfDemention(Dim.Z);
-		kZ[2] = node2.getValueOfDemention(Dim.Z);
-		kZ[3] = node3.getValueOfDemention(Dim.Z);
+		kZ[0] = node0.getPosition(Axis.Z);
+		kZ[1] = node1.getPosition(Axis.Z);
+		kZ[2] = node2.getPosition(Axis.Z);
+		kZ[3] = node3.getPosition(Axis.Z);
 
 		for (int i = 0; i < node_count; i++) {
 			A[i * 3][0] = 1.0f;
@@ -92,7 +86,7 @@ public class StaticDeformationSolver {
 	 * form matrix Q. In this problem the matrix havn't variable.It have only
 	 * constants.
 	 */
-	public double[][] formMatrixQ() {
+	private double[][] formMatrixQ() {
 
 		double[][] Q = { 
 				{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -108,21 +102,17 @@ public class StaticDeformationSolver {
 	/**
 	 * form Elastic matrix E [6x6]
 	 * 
-	 * @param locG
+	 * @param G
 	 *            Yung modulus
-	 * @param locMy
+	 * @param v
 	 *            Puasson coefficient
 	 * @return
 	 */
-	public double[][] formMatrixE(double locG, double locMy) {
+	private double[][] formMatrixE(double G, double v) {
 
-		// This variables if for better readable code
-		
-		
-		//NOTE переделал по новому зенкевичу
-		double a = 1 - locMy;
-		double b = (1-2*locMy)/2.0;
-		double c = locMy;
+		double a = 1 - v;
+		double b = (1-2*v)/2.0;
+		double c = v;
 		
 		double[][] E = { 
 			{ a, c, c, 0, 0, 0 }, 
@@ -132,44 +122,63 @@ public class StaticDeformationSolver {
 			{ 0, 0, 0, 0, b, 0 }, 
 			{ 0, 0, 0, 0, 0, b } };
 
-		double kafE = locG/((1+locMy)*(1-2.0*locMy));
-		E = MMath.MUL(E, kafE);
+		double kafE = G/((1+v)*(1-2.0*v));
+		E = MUL(E, kafE);
 
-		
-		/*
-		double a = locMy / (1 - locMy);
-		double b = (1.0f - 2.0f * locMy) / (2.0f * (1.0f - locMy));
-
-		double[][] E = { 
-			{ 1, a, a, 0, 0, 0 }, 
-			{ a, 1, a, 0, 0, 0 },
-			{ a, a, 1, 0, 0, 0 }, 
-			{ 0, 0, 0, b, 0, 0 },
-			{ 0, 0, 0, 0, b, 0 }, 
-			{ 0, 0, 0, 0, 0, b } };
-
-		double kafE = (locG * (1 - locMy)) / ((1 + locMy) * (1 - 2.0f * locMy));
-		E = MMath.MUL(E, kafE);
-*/
 		return E;
 	}
 
+	private double[][] formMatrixN(Element element) throws Exception {
+		
+		double[][] A = formMatrixA(element);		
+		double[][] N = INV(A);
+		
+		return N;
+	}
+	
+	private double[][] formMatrixB(Element element) throws Exception {
+		double[][] N = formMatrixN(element);
+		double[][] Q = formMatrixQ();
+		
+		double[][] B = MUL(Q,N);
+		return B;
+	}
+
+	/**
+	 * Local Matrix K
+	 * Calc Ve * [N]T*[Q]T*[E]*[Q]*[N] 
+	 * or
+	 * Ve * [B]T*[E]*[N]
+	 * 
+	 * @param element
+	 * @return
+	 * @throws Exception
+	 */
+	private double[][] formLocalK(Element element) throws Exception {
+		
+		Material material = (Material) element.getMatherial();
+		double G = material.getElasticModulus();
+		double v = material.getPoissonsRatio();
+		double[][] E = formMatrixE(G, v);
+		
+		double[][] B = formMatrixB(element);
+		double Ve = element.getVolume();
+
+		double[][] K;
+		K = MUL(T(B), E);
+		K = MUL(K, B);
+		K = MUL(K, Ve);
+		
+		return K;
+	}
 	
 	
-	// const int RANK_B_COL = 4;
-	// const int RANK_B_ROW = 3;
-
-	// protected double[,] formMatrixB()
-	// {
-	// double[,] retB = new double[RANK_B_ROW, RANK_B_COL];
-	//
-	// retB[0, 1] = 1;
-	// retB[1, 2] = 1;
-	// retB[2, 3] = 1;
-	//
-	// return retB;
-	// }
-
+	
+	
+	
+	
+	
+	
 	// / <summary>
 	// / Вектор нагрузок
 	// / </summary>
@@ -188,70 +197,19 @@ public class StaticDeformationSolver {
 	 */
 	final int DEGREES_OF_FREEDOM = 3;
 
-	private double calcVolumeOfElement(IElement element) throws Exception {
-		Node node0 = element.getNode(0);
-		Node node1 = element.getNode(1);
-		Node node2 = element.getNode(2);
-		Node node3 = element.getNode(3);
-		
-		double[][] md = {
-				{ 1, 
-				node0.getValueOfDemention(Dim.X),
-				node0.getValueOfDemention(Dim.Y),
-				node0.getValueOfDemention(Dim.Z) },
-			    { 1, 
-				node1.getValueOfDemention(Dim.X),
-				node1.getValueOfDemention(Dim.Y),
-				node1.getValueOfDemention(Dim.Z) },
-				{ 1, 
-				node2.getValueOfDemention(Dim.X),
-				node2.getValueOfDemention(Dim.Y),
-				node2.getValueOfDemention(Dim.Z) },
-				{ 1, 
-				node3.getValueOfDemention(Dim.X),
-				node3.getValueOfDemention(Dim.Y),
-				node3.getValueOfDemention(Dim.Z) } 
-			};
-
-		double Ve = Math.abs(MMath.DET(md)) / 6.0;
-		return Ve;
-	}
-	
 	public double[][] formGlobalK() throws Exception {
-		List<IElement> elements = analisis.getMesh().getElements();
-		List<Node> nodes = analisis.getMesh().getNodes();
-
-		double[][] Q = formMatrixQ();
-
-		// Initialization Global Stiffness Matrix 
-		double[][] gK = new double[nodes.size() * DEGREES_OF_FREEDOM][nodes.size() * DEGREES_OF_FREEDOM];
+		List<Element> elements = analysis.getMesh().getElements();
+		int nodesCount = analysis.getMesh().getNodes().size();
 		
+		// Initialization Global Stiffness Matrix 
+		double[][] gK = new double[nodesCount * DEGREES_OF_FREEDOM][nodesCount * DEGREES_OF_FREEDOM];
 		
 		R = new double[gK.length];
 
 		// For each element do ...
-		for (IElement element : elements) {
+		for (Element element : elements) {
 			
-			Material material = (Material) element.getMatherial();
-
-			// TODO WARM в параметрах
-			double[][] curE = formMatrixE(material.getElasticModulus(),
-					material.getPoissonsRatio());
-
-			// Формируем координатную матрицу для текущего элемента
-			double[][] A = formMatrixA(element);
-					
-			B = MMath.INV(A);
-
-			double Ve = calcVolumeOfElement(element);
-
-			// Формирование локальной матрицы жесткости
-			double[][] K;
-		    K = MMath.MUL(MMath.T(B), MMath.T(Q));
-			K = MMath.MUL(K, curE);
-			K = MMath.MUL(K, Q);
-			K = MMath.MUL(K, B);
-			K = MMath.MUL(K, Ve);
+			double[][] K = formLocalK(element);
 
 			// Записуем текущую локальную матрицу в глобальную
 			for (int si = 0; si < COUNT_NODES; si++)
@@ -261,9 +219,9 @@ public class StaticDeformationSolver {
 
 							// TODO Возможна ошибка при нахождении индекса в
 							// коллекции
-							int ind_si = analisis.getMesh().getNodes()
+							int ind_si = analysis.getMesh().getNodes()
 									.lastIndexOf(element.getNode(si));
-							int ind_sj = analisis.getMesh().getNodes()
+							int ind_sj = analysis.getMesh().getNodes()
 									.lastIndexOf(element.getNode(sj));
 
 							gK[ind_si * DEGREES_OF_FREEDOM + ki][ind_sj
@@ -284,14 +242,14 @@ public class StaticDeformationSolver {
 	public void setBoundaries(double[][] gK) throws Exception {
 
 		// Важно чтобы фиксация происходила после указания нагрузок
-		for (ILoad load : analisis.getLoads()) {
+		for (ILoad load : analysis.getLoads()) {
 			if (load instanceof StaticEvenlyDistributedLoad) {
 				addLoad((StaticEvenlyDistributedLoad) load);
 			}
 		}
 
 		// Фиксируем грани
-		for (ILoad load : analisis.getLoads()) {
+		for (ILoad load : analysis.getLoads()) {
 			if (load instanceof Support) {
 				fixNodes(gK, load.getBoundary().getNodes());
 			}
@@ -300,7 +258,7 @@ public class StaticDeformationSolver {
 
 	private void fixNodes(double[][] gK, List<Node> fixedNodes) {
 		for (Node node : fixedNodes) {
-			int numberFixedNode = analisis.getMesh().getNodes()
+			int numberFixedNode = analysis.getMesh().getNodes()
 					.lastIndexOf(node);
 
 			for (int j = 0; j < 3; j++) {
@@ -329,7 +287,7 @@ public class StaticDeformationSolver {
 			// Значение должно прибовлятся к существующему, так как на некоторые
 			// узлы уже может быть
 			// оказана нагрузка
-			R[(analisis.getMesh().getNodes().lastIndexOf(node) * DEGREES_OF_FREEDOM) + 2] += nodeLoad;
+			R[(analysis.getMesh().getNodes().lastIndexOf(node) * DEGREES_OF_FREEDOM) + 2] += nodeLoad;
 		}
 	}
 
@@ -341,10 +299,10 @@ public class StaticDeformationSolver {
 		
 		
 		//Calculation of Deformation 
-		R = MMath.gausSLAU(gK, R);
+		R = gausSLAU(gK, R);
 		
 		//form deformation result
-		int nodeSize = analisis.getMesh().getNodes().size();
+		int nodeSize = analysis.getMesh().getNodes().size();
 		Deformation[] deformations = new Deformation[nodeSize];
 		
 		Map<Node, Deformation> deformation_test = new HashMap<>();
@@ -360,12 +318,12 @@ public class StaticDeformationSolver {
 			deformations[i] = def;
 			
 			//TODO : эксперементальная фича
-			Node node = analisis.getMesh().getNodes().get(i);
+			Node node = analysis.getMesh().getNodes().get(i);
 			deformation_test.put(node, def);
 		}
 		
 		//Calculation of Strain
-		List<IElement> elements =  analisis.getMesh().getElements();
+		List<Element> elements =  analysis.getMesh().getElements();
 		
 		Strain[] strains = new Strain[elements.size()];
 		StrainEnergy[] strainEnergy = new StrainEnergy[elements.size()];
@@ -375,13 +333,13 @@ public class StaticDeformationSolver {
 		DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
 		Temperature[] temperatures = new Temperature[nodeSize];
 		
-		for (IElement element : elements) {
+		for (Element element : elements) {
 			
 			// Формируем координатную матрицу для текущего элемента
 			double[][] A = formMatrixA(element);		
-			B = MMath.INV(A);
+			double[][] B = INV(A);
 			
-			double[][] QQ = MMath.MUL(Q, B); 
+			double[][] QQ = MUL(Q, B); 
 			
 			// Tetr element has 4 nodes
 			final int COUNT_NODES_IN_ELEMENT = 4;
@@ -389,23 +347,23 @@ public class StaticDeformationSolver {
 			
 			for(int i = 0; i < COUNT_NODES_IN_ELEMENT; i++) {
 				Node node = element.getNode(i);
-				int nodeNumber = analisis.getMesh().getNodes().indexOf(node);
+				int nodeNumber = analysis.getMesh().getNodes().indexOf(node);
 				
 				curDeff[i*DEGREES_OF_FREEDOM] = deformations[nodeNumber].getX();
 				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations[nodeNumber].getY();
 				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations[nodeNumber].getZ();
 			}
 		
-			double[] e_e = MMath.MUL(QQ, curDeff);
+			double[] e_e = MUL(QQ, curDeff);
 			
-			int elemNumber = analisis.getMesh().getElements().indexOf(element);
+			int elemNumber = analysis.getMesh().getElements().indexOf(element);
 			
 			strains[elemNumber] = new Strain(e_e[0], e_e[1], e_e[2], e_e[3], e_e[4], e_e[5]);
 		
 		
 			//form values of ecvivalent of deformation in nodes
 			for(int i =0;i< COUNT_NODES; i++) {
-				int ind_sj = analisis.getMesh().getNodes()
+				int ind_sj = analysis.getMesh().getNodes()
 						.lastIndexOf(element.getNode(i));
 				
 				double eInNode = e_e[0]+e_e[1]+e_e[2];
@@ -430,10 +388,10 @@ public class StaticDeformationSolver {
 			//TODO переделать обязательно
 			int[] idx = new int[COUNT_NODES];
 			
-			idx[0] = analisis.getMesh().getNodes().indexOf(element.getNode(0));
-			idx[1] = analisis.getMesh().getNodes().indexOf(element.getNode(1));
-			idx[2] = analisis.getMesh().getNodes().indexOf(element.getNode(2));
-			idx[3] = analisis.getMesh().getNodes().indexOf(element.getNode(3));
+			idx[0] = analysis.getMesh().getNodes().indexOf(element.getNode(0));
+			idx[1] = analysis.getMesh().getNodes().indexOf(element.getNode(1));
+			idx[2] = analysis.getMesh().getNodes().indexOf(element.getNode(2));
+			idx[3] = analysis.getMesh().getNodes().indexOf(element.getNode(3));
 			
 			double[] res = new double[COUNT_NODES * DEGREES_OF_FREEDOM];		
 			for(int i =0;i< COUNT_NODES;i++) {
@@ -454,21 +412,21 @@ public class StaticDeformationSolver {
 			// Формируем координатную матрицу для текущего элемента
 			double[][] AA = formMatrixA(element);
 					
-			double[][] BB = MMath.INV(AA);
+			double[][] BB = INV(AA);
 
-			double Ve = calcVolumeOfElement(element);
+			double Ve = element.getVolume();
 
 			// Формирование локальной матрицы жесткости
 			double[][] KK;
-		    KK = MMath.MUL(MMath.T(BB), MMath.T(Q));
-			KK = MMath.MUL(KK, curE);
-			KK = MMath.MUL(KK, Q);
-			KK = MMath.MUL(KK, BB);
-			KK = MMath.MUL(KK, Ve);
+		    KK = MUL(T(BB), T(Q));
+			KK = MUL(KK, curE);
+			KK = MUL(KK, Q);
+			KK = MUL(KK, BB);
+			KK = MUL(KK, Ve);
 			
-			double[] dd = MMath.MUL(res, KK);
+			double[] dd = MUL(res, KK);
 			
-			double energy = MMath.MUL(dd,res)*0.5;
+			double energy = MUL(dd,res)*0.5;
 			
 			strainEnergy[elemNumber] = new StrainEnergy(energy);
 		
@@ -486,7 +444,7 @@ public class StaticDeformationSolver {
 			
 			for(int i =0;i< COUNT_NODES; i++) {
 				
-				int ind_sj = analisis.getMesh().getNodes()
+				int ind_sj = analysis.getMesh().getNodes()
 						.lastIndexOf(element.getNode(i));
 				
 				
@@ -503,7 +461,7 @@ public class StaticDeformationSolver {
 		StaticStructuralResult result = new StaticStructuralResult(deformation_test, strains, strainEnergy);
 		result.setDeformationInNode(defInNodes);
 		result.setTemperatures(temperatures);
-		analisis.setResult(result);
+		analysis.setResult(result);
 	}
 
 	public double getResultX(int i) {

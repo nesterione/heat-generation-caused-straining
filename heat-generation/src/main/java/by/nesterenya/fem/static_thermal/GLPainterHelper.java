@@ -19,15 +19,15 @@ import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.analysis.result.Temperature;
 import by.nesterenya.fem.element.*;
-import by.nesterenya.fem.element.Node.Dim;
+import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.primitives.Box;
 
 public class GLPainterHelper {
 	
 	// TODO Может быть переместить в лучшее место, может методы расширения
 	private static void drawGlVertex3d(GL2 gl,Node node) throws Exception {
-	    gl.glVertex3d(node.getValueOfDemention(Dim.X), node.getValueOfDemention(Dim.Y),
-	        node.getValueOfDemention(Dim.Z));
+	    gl.glVertex3d(node.getPosition(Axis.X), node.getPosition(Axis.Y),
+	        node.getPosition(Axis.Z));
 	  }
 
 	public static void plotMesh(GL2 gl, Position position, IMesh mesh) throws Exception {
@@ -70,8 +70,8 @@ public class GLPainterHelper {
 
 	    // Отрисовываем все конечные элементы
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = mesh.getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = mesh.getElements();
+	    for (Element element : elements) {
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
 	      Node node2 = element.getNode(2);
@@ -200,8 +200,8 @@ public class GLPainterHelper {
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = analysis.getMesh().getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = analysis.getMesh().getElements();
+	    for (Element element : elements) {
 	    
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
@@ -279,8 +279,8 @@ public class GLPainterHelper {
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = analysis.getMesh().getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = analysis.getMesh().getElements();
+	    for (Element element : elements) {
 
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
@@ -358,8 +358,8 @@ public class GLPainterHelper {
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = analysis.getMesh().getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = analysis.getMesh().getElements();
+	    for (Element element : elements) {
 
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
@@ -430,8 +430,8 @@ public class GLPainterHelper {
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = analysis.getMesh().getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = analysis.getMesh().getElements();
+	    for (Element element : elements) {
 
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
@@ -481,7 +481,7 @@ public class GLPainterHelper {
 	
 	//TODO проверить изменение растояния в у STREEs вектор изменения растояния между узлами
 	
-	private static void DrawGLColor3fStrain(GL2 gl, IElement element, StaticDeformationAlalysis analysis) {
+	private static void DrawGLColor3fStrain(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
 		int indexElement = analysis.getMesh().getElements().indexOf(element);
 		
 		Strain strain = analysis.getResult().getStrains()[indexElement];
@@ -505,9 +505,9 @@ public class GLPainterHelper {
 	// TODO Может быть переместить в лучшее место, может методы расширения а лучьше Dependesy Injecton
 	private static void drawGLVertex3d_deformation(GL2 gl, Node node, StaticDeformationAlalysis analysis) throws Exception {
 		
-		double x = node.getValueOfDemention(Dim.X);
-		double y = node.getValueOfDemention(Dim.Y);
-		double z = node.getValueOfDemention(Dim.Z);
+		double x = node.getPosition(Axis.X);
+		double y = node.getPosition(Axis.Y);
+		double z = node.getPosition(Axis.Z);
 		
 		StaticStructuralResult result = analysis.getResult();
 		double dx = result.getDeformation(node).getX();
@@ -760,8 +760,8 @@ public class GLPainterHelper {
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
 	    gl.glBegin(GL.GL_TRIANGLES);
-	    List<IElement> elements = analysis.getMesh().getElements();
-	    for (IElement element : elements) {
+	    List<Element> elements = analysis.getMesh().getElements();
+	    for (Element element : elements) {
 
 	      Node node0 = element.getNode(0);
 	      Node node1 = element.getNode(1);
@@ -797,7 +797,7 @@ public class GLPainterHelper {
 	    gl.glFlush();
 	}
 
-	private static void DrawGLColor3fEnergy(GL2 gl, IElement element, StaticDeformationAlalysis analysis) {
+	private static void DrawGLColor3fEnergy(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
 		int indexElement = analysis.getMesh().getElements().indexOf(element);
 		
 		StrainEnergy strainEnergy = analysis.getResult().getStrainEnergy()[indexElement];
@@ -907,8 +907,8 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
     gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
 
     gl.glBegin(GL.GL_TRIANGLES);
-    List<IElement> elements = analysis.getMesh().getElements();
-    for (IElement element : elements) {
+    List<Element> elements = analysis.getMesh().getElements();
+    for (Element element : elements) {
 
       Node node0 = element.getNode(0);
       Node node1 = element.getNode(1);

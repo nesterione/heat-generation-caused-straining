@@ -4,9 +4,9 @@ import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.analysis.result.StaticThermalResult;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticTemperature;
-import by.nesterenya.fem.element.IElement;
+import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
-import by.nesterenya.fem.element.Node.Dim;
+import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.element.material.Material;
 
 /**
@@ -140,25 +140,25 @@ public class ThermalStaticSolver {
 																 * ()
 																 */; i++) {
 
-			IElement element = analis.getMesh().getElements().get(i);
+			Element element = analis.getMesh().getElements().get(i);
 			Node node0 = element.getNode(0);
 			Node node1 = element.getNode(1);
 			Node node2 = element.getNode(2);
 			Node node3 = element.getNode(3);
 
 			// TODO убрать эти грабли
-			double[][] H = formLocalMxH(node0.getValueOfDemention(Dim.X),
-					node0.getValueOfDemention(Dim.Y),
-					node0.getValueOfDemention(Dim.Z),
-					node1.getValueOfDemention(Dim.X),
-					node1.getValueOfDemention(Dim.Y),
-					node1.getValueOfDemention(Dim.Z),
-					node2.getValueOfDemention(Dim.X),
-					node2.getValueOfDemention(Dim.Y),
-					node2.getValueOfDemention(Dim.Z),
-					node3.getValueOfDemention(Dim.X),
-					node3.getValueOfDemention(Dim.Y),
-					node3.getValueOfDemention(Dim.Z), i);
+			double[][] H = formLocalMxH(node0.getPosition(Axis.X),
+					node0.getPosition(Axis.Y),
+					node0.getPosition(Axis.Z),
+					node1.getPosition(Axis.X),
+					node1.getPosition(Axis.Y),
+					node1.getPosition(Axis.Z),
+					node2.getPosition(Axis.X),
+					node2.getPosition(Axis.Y),
+					node2.getPosition(Axis.Z),
+					node3.getPosition(Axis.X),
+					node3.getPosition(Axis.Y),
+					node3.getPosition(Axis.Z), i);
 
 			//
 			// Формирование глобальных матриц
@@ -167,7 +167,7 @@ public class ThermalStaticSolver {
 				for (int sj = 0; sj < COUNT_NODES; sj++)
 					for (int ki = 0; ki < DEGREES_OF_FREEDOM; ki++)
 						for (int kj = 0; kj < DEGREES_OF_FREEDOM; kj++) {
-							IElement elem = analis.getMesh().getElements()
+							Element elem = analis.getMesh().getElements()
 									.get(i);
 							// TODO Возможна ошибка при нахождении индекса в
 							// коллекции

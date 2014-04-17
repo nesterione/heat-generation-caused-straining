@@ -1,26 +1,20 @@
 package by.nesterenya.fem.element;
 
-/**
- * 
- * @author igor <br>
- *         Базовый интерфейс для узлов элемента
- */
 public interface Node {
 
-  public enum Dim {
+  public enum Axis {
 
     X(0), Y(1), Z(2);
 
     private final int id;
 
-    Dim(int id) {
+    Axis(int id) {
       this.id = id;
     }
 
     public int getValue() {
       return id;
     }
-
   };
 
   /**
@@ -28,7 +22,7 @@ public interface Node {
    * @param demention Размерность пространства, например x = 0, y = 1, z = 2
    * @return координата в пространстве
    */
-  double getValueOfDemention(Dim demention) throws Exception;
+  double getPosition(Axis axis);
 
   /**
    * Узнать размерность узла

@@ -322,6 +322,9 @@ public class STModeling implements ActionListener {
 				e.printStackTrace();
 			}
 			
+//			задавать силу
+			// TODO F = A*sin(w*t)
+			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
 			glDisplay.setDisplayType(DisplayType.DEFORMATION);

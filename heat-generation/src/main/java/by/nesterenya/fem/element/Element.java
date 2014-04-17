@@ -8,8 +8,11 @@ import by.nesterenya.fem.element.material.*;
  * Интерфейс элемента, общий интерфей для всех конечных элементов
  * Имеет два метода, для получения свойств материала
  */
-public interface IElement {
-	public IMaterial getMatherial();
+public interface Element {
 	
+	//TODO убрать материал
+	IMaterial getMatherial();
 	Node getNode(int number) throws Exception;
+	
+	double getVolume();
 }

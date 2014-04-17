@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import by.nesterenya.fem.boundary.Boundary;
-import by.nesterenya.fem.element.IElement;
+import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node3d;
 import by.nesterenya.fem.element.Tet4n;
@@ -63,7 +63,7 @@ public class BoxMesher implements IMesher {
 	public IMesh formMesh() throws Exception {
 		Map<String, Boundary> boundaries = initBoundariesMap(getBox());
 		List<Node> nodes = new ArrayList<>();
-		List<IElement> elements = new ArrayList<>();
+		List<Element> elements = new ArrayList<>();
 		Map<Integer, IMaterial> materials = new HashMap<>();
 
 		int nCntOX = getNodeCountOX();
