@@ -283,6 +283,33 @@ public class StaticDeformationSolver {
 		return deformations;
 	}
 	
+	private Map<Element, Strain> evaluateStrainResult(Map<Node, Deformation> deformations) throws Exception {
+		
+		Map<Element, Strain> strains = new HashMap<>();
+		List<Element> elements = analysis.getMesh().getElements();
+		
+		for (Element element : elements) {
+			
+			double[][] B  = formMatrixB(element);
+			
+			double[] currentDeformations = new double[COUNT_NODES*DEGREES_OF_FREEDOM];
+			for(int i = 0; i < COUNT_NODES; i++) {
+				
+				Deformation deformation = deformations.get(element.getNode(i));
+				currentDeformations[i*DEGREES_OF_FREEDOM] = deformation.getX();
+				currentDeformations[i*DEGREES_OF_FREEDOM+1] = deformation.getY();
+				currentDeformations[i*DEGREES_OF_FREEDOM+2] = deformation.getZ();
+			}
+			
+			double[] e = MUL(B, currentDeformations);
+			Strain strain = new Strain(e[0], e[1], e[2], e[3], e[4], e[5]);
+			
+			strains.put(element, strain);
+		}
+		
+		return strains;
+	}
+	
 	public void Solve() throws Exception {
 		
 		double[][] gK = formGlobalK();
@@ -293,30 +320,22 @@ public class StaticDeformationSolver {
 		double[] result = gausSLAU(gK, R);
 				
 		Map<Node, Deformation> deformations = evaluateDeformationResult(result);
+		Map<Element, Strain> strains = evaluateStrainResult(deformations);
 		
 		
 		
 		
+		List<Element> elements = analysis.getMesh().getElements();
 		int nodeSize = analysis.getMesh().getNodes().size();
-		
-		//Calculation of Strain
-		List<Element> elements =  analysis.getMesh().getElements();
-		
-		Strain[] strains = new Strain[elements.size()];
 		StrainEnergy[] strainEnergy = new StrainEnergy[elements.size()];
-		
-		double[][] Q  = formMatrixQ();
-		
-		DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
+		//DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
 		Temperature[] temperatures = new Temperature[nodeSize];
 		
+		//Calculation of Strain
+		
+		double[][] Q  = formMatrixQ();
+
 		for (Element element : elements) {
-			
-			// Формируем координатную матрицу для текущего элемента
-			double[][] A = formMatrixA(element);		
-			double[][] B = INV(A);
-			
-			double[][] QQ = MUL(Q, B); 
 			
 			// Tetr element has 4 nodes
 			final int COUNT_NODES_IN_ELEMENT = 4;
@@ -331,15 +350,11 @@ public class StaticDeformationSolver {
 				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations.get(node).getZ();
 			}
 		
-			double[] e_e = MUL(QQ, curDeff);
 			
-			int elemNumber = element.getGlobalIndex();
-			
-			strains[elemNumber] = new Strain(e_e[0], e_e[1], e_e[2], e_e[3], e_e[4], e_e[5]);
 		
 		
 			//form values of ecvivalent of deformation in nodes
-			for(int i =0;i< COUNT_NODES; i++) {
+			/*for(int i =0;i< COUNT_NODES; i++) {
 				int ind_sj = element.getNode(i).getGlobalIndex();
 				
 				double eInNode = e_e[0]+e_e[1]+e_e[2];
@@ -352,7 +367,7 @@ public class StaticDeformationSolver {
 					defInNodes[ind_sj] = new DeformationInNode(nDef);
 				}
 				
-			}
+			}*/
 			
 			//
 			// Calculation strain energy
@@ -396,7 +411,7 @@ public class StaticDeformationSolver {
 			
 			double energy = MUL(dd,res)*0.5;
 			
-			strainEnergy[elemNumber] = new StrainEnergy(energy);
+			strainEnergy[element.getGlobalIndex()] = new StrainEnergy(energy);
 		
 			
 			//
@@ -426,7 +441,7 @@ public class StaticDeformationSolver {
 		}
 		
 		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergy);
-		res.setDeformationInNode(defInNodes);
+		//res.setDeformationInNode(defInNodes);
 		res.setTemperatures(temperatures);
 		analysis.setResult(res);
 	}

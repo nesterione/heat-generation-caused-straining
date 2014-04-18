@@ -3,38 +3,29 @@ package by.nesterenya.fem.analysis.result;
 import java.util.Collection;
 import java.util.Map;
 
+import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
 
-//TODO подумать о замене массивов на коллекции
+//TODO Возможно следует разместить тип результата в отдельные объекты
 public class StaticStructuralResult implements Result {
-
+	
 	private Double minDeformation = null;
 	private Double maxDeformation = null;
 	
+	private Double minStrain = null;
+	private Double maxStrain = null;
+	
 	private Map<Node, Deformation> deformations;
+	private Map<Element, Strain> strains;
 	
 	private DeformationInNode[] deformationInNode;
-	private Strain[] strains;
 	private StrainEnergy[] strainEnergy;
 	private Temperature[] temperatures;
 	
-	
-	
-	
-	//TODO: подумать, может результат хранить для каждого элемента
-	
-	public StaticStructuralResult(Map<Node, Deformation> deformations, Strain[] strains, StrainEnergy[] strainEnergy) {
+	public StaticStructuralResult(Map<Node, Deformation> deformations, Map<Element, Strain> strains, StrainEnergy[] strainEnergy) {
 		setDeformations(deformations);
 		setStrains(strains);
 		setStrainEnergy(strainEnergy);
-	}
-
-	public Strain[] getStrains() {
-		return strains;
-	}
-
-	public void setStrains(Strain[] strains) {
-		this.strains = strains;
 	}
 
 	public DeformationInNode[] getDeformationInNode() {
@@ -61,14 +52,6 @@ public class StaticStructuralResult implements Result {
 		this.temperatures = temperatures;
 	}
 
-	/*public Map<Node, Deformation> getDoformations_test() {
-		return doformations_test;
-	}*/
-
-	public Deformation getDeformation(Node node) {
-		return deformations.get(node);
-	}
-	
 	private double maxOfThree(double x, double y, double z) {
 		if(x>y&&x>z) {
 			return x;
@@ -78,6 +61,10 @@ public class StaticStructuralResult implements Result {
 		return z;
 	}
 	
+	
+	//
+	// Deformations
+	//
 	public double getMinDeformation() {
 		
 		if(minDeformation==null) {
@@ -119,7 +106,74 @@ public class StaticStructuralResult implements Result {
 		return maxDeformation;
 	}
 	
+	
+	public Deformation getDeformation(Node node) {
+		return deformations.get(node);
+	}
+	
 	public void setDeformations(Map<Node, Deformation> deformations) {
 		this.deformations = deformations;
+	}
+	
+	//
+	// Strains
+	//
+	private double evalTotalStrain(Strain strain) {
+
+		return Math.abs(strain.getEx())+Math.abs(strain.getEy())+Math.abs(strain.getEz());
+	}
+	
+	public double getMinStrain() {
+		
+		if(minStrain==null) {
+			
+			Collection<Strain> strs = strains.values();
+			double min = Double.MAX_VALUE;
+			
+			for(Strain str : strs ) {
+				double current = evalTotalStrain(str);
+				if(min> current) {
+					min = current;
+				}
+			}
+			
+			minStrain = min;
+		}
+		
+		return minStrain;
+	}
+	
+	public double getMaxStrain() {
+		
+		if(maxStrain==null) {
+			
+			Collection<Strain> strs = strains.values();
+			double max = Double.MIN_VALUE;
+			
+			for(Strain str : strs ) {
+				double current = evalTotalStrain(str);
+				if(max < current) {
+					max = current;
+				}
+			}
+			maxStrain = max;
+			//TODO убрать
+			System.out.println("Strain >" + maxStrain);
+		}
+		
+		return maxStrain;
+	}
+	
+	public Strain getStrain(Element element) {
+		return strains.get(element);
+	}
+	
+	public double getTotalStrain(Element element) {
+		Strain strain = strains.get(element);
+		return evalTotalStrain(strain);
+	}
+
+	public void setStrains(Map<Element, Strain> strains) {
+		this.strains = strains;
 	}
 }

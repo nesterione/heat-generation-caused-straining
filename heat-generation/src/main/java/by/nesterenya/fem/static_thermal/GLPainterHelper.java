@@ -478,17 +478,9 @@ public class GLPainterHelper {
 	    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
 	    gl.glFlush();
 	}
-	
-	//TODO проверить изменение растояния в у STREEs вектор изменения растояния между узлами
-	
+
 	private static void DrawGLColor3fStrain(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
-		int indexElement = element.getGlobalIndex();
-		
-		Strain strain = analysis.getResult().getStrains()[indexElement];
-		
-		//TODO восможно слаживать значенмя нужно не так
-		double vectorOfDeformation = calcVL(strain);
-		
+		double vectorOfDeformation = analysis.getResult().getTotalStrain(element);
 		setColorStraining(gl, vectorOfDeformation, analysis.getResult());
 	}
 	
@@ -541,44 +533,8 @@ public class GLPainterHelper {
 	
 	private static int setColorStraining(GL2 gl, double value, StaticStructuralResult result) {
 	    
-		Strain[] strains = result.getStrains();
-		//TODO Оптимизировать, без лишних пересчетов
-	    double min = Math.abs(calcVL(strains[0])); 
-	    double max = Math.abs(calcVL(strains[0]));
-	    
-	    for(int i= 0;i<result.getStrains().length ;i++) {
-	    	
-	    	double curValue = Math.abs(calcVL(strains[i]));
-	    	
-	      if(min> curValue) {
-	        min = curValue;
-	      }
-	      if(max< curValue) {
-	        max = curValue;
-	      }
-	    }
-	    
-	    value = Math.abs(value);
-	    
-	    //TODO объем элемента при 1*1*0,15 размерах при разбиении 10 10 3
-	   /* double Ve = 1.5432098765432112E-4;
-	    double E = 2100000000;
-	    double U = 0.5*Ve*E*max*max;
-	    
-	    double c = 0.462;//TODO Warn
-	    double ro = 7850;
-	    double Cv = c*ro/**Ve*/;
-	    
-	    //double dT = (0.9*U)/Cv;*/
-	    //System.out.println(">> "+dT);
-	    
-	   // System.out.println("} "+ max*Ve);
-	    //5595173599385485E-5
-	    //0.00005595173599385485;
-	   // double dd = 3.9422688136438355E7
-	   // 39422.68813643836
-	    
-	    System.out.println(max);
+	    double min = result.getMinStrain(); 
+	    double max = result.getMaxStrain();
 	    
 	    double step = (max - min) / 9.0f;
 	    int color = 0;
