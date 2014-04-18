@@ -8,18 +8,15 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
-import javax.naming.spi.DirStateFactory.Result;
 
-import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
-import by.nesterenya.fem.analysis.result.Deformation;
 import by.nesterenya.fem.analysis.result.StaticStructuralResult;
-import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
-import by.nesterenya.fem.analysis.result.Temperature;
-import by.nesterenya.fem.element.*;
+import by.nesterenya.fem.element.Element;
+import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node.Axis;
+import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
 
 public class GLPainterHelper {
@@ -509,173 +506,33 @@ public class GLPainterHelper {
 		//TODO здесь учитываеться только Z
 		setColorStructal(gl, analysis.getResult().getDeformation(node).getZ(), analysis.getResult());
 	}
-	
-	private static double calcVL(Strain strain){
-		//return Math.sqrt( strain.getEx()*strain.getEx()+strain.getEy()*strain.getEy()+strain.getEz()*strain.getEz()  );
 		
-		double x = strain.getEx();
-		double y = strain.getEy();
-		double z = strain.getEz();
-		
-		if(x>y&&x>z) 
-			return x;
-		if(y>z&&y>x)
-			return y;
-		else  
-			return z;
-		
-		//return strain.getEx()+strain.getEy()+strain.getEz();
-	}
-	
-	private static int setColorStraining(GL2 gl, double value, StaticStructuralResult result) {
+	private static void setColorStraining(GL2 gl, double value, StaticStructuralResult result) {
 	    //TODO potencial error, when draw Nodal Strain I don't get max/min values NodalSrain
 	    double min = result.getMinStrain(); 
 	    double max = result.getMaxStrain();
 	    
-	    double step = (max - min) / 9.0f;
-	    int color = 0;
-
-	    for (double st = min + step; color < 9; st += step, color++)
-	      if (value <= st) {
-	        break;
-	      }
-
-	    switch (color) {
-	      case 0:
-	        gl.glColor3f(0.0f, 0.0f, 1.0f); // синий
-	        break;
-	      case 1:
-	        gl.glColor3f(0.078f, 0.482f, 0.98f); // светлосиний
-	        break;
-	      case 2:
-	        gl.glColor3f(0.086f, 0.906f, 0.973f); // голубой
-	        break;
-	      case 3:
-	        gl.glColor3f(0.094f, 0.961f, 0.573f); // голубоватый
-	        break;
-	      case 4:
-	        gl.glColor3f(0.0f, 1.0f, 0.0f); // зелёный
-	        break;
-	      case 5:
-	        gl.glColor3f(0.62f, 0.984f, 0.075f); // зеленоватый
-	        break;
-	      case 6:
-	        gl.glColor3f(0.957f, 0.98f, 0.078f); // желтый
-	        break;
-	      case 7:
-	        gl.glColor3f(0.988f, 0.667f, 0.070f); // оранжевый
-	        break;
-	      case 8:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	      default:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	    }
-
-	    return color;
+	    setColor(gl, min, max, value);
 }
 	
 	private static void DrawGLColor3f(GL2 gl, Node node, ThermalStaticAnalisis analysis) {
 	    setColorThermal(gl, analysis.getResult().getT()[node.getGlobalIndex()]);
 	}
 	
-	private static int setColorStructal(GL2 gl, double value, StaticStructuralResult result) {
-		    double min = result.getMinDeformation(); 
-		    double max = result.getMaxDeformation();
+	private static void setColorStructal(GL2 gl, double value, StaticStructuralResult result) {
+		double min = result.getMinDeformation(); 
+		double max = result.getMaxDeformation();
 		    
-		    double step = (max - min) / 9.0f;
-		    int color = 0;
-
-		    for (double st = min + step; color < 9; st += step, color++)
-		      if (value <= st) {
-		        break;
-		      }
-
-		    switch (color) {
-		      case 0:
-		        gl.glColor3f(0.0f, 0.0f, 1.0f); // синий
-		        break;
-		      case 1:
-		        gl.glColor3f(0.078f, 0.482f, 0.98f); // светлосиний
-		        break;
-		      case 2:
-		        gl.glColor3f(0.086f, 0.906f, 0.973f); // голубой
-		        break;
-		      case 3:
-		        gl.glColor3f(0.094f, 0.961f, 0.573f); // голубоватый
-		        break;
-		      case 4:
-		        gl.glColor3f(0.0f, 1.0f, 0.0f); // зелёный
-		        break;
-		      case 5:
-		        gl.glColor3f(0.62f, 0.984f, 0.075f); // зеленоватый
-		        break;
-		      case 6:
-		        gl.glColor3f(0.957f, 0.98f, 0.078f); // желтый
-		        break;
-		      case 7:
-		        gl.glColor3f(0.988f, 0.667f, 0.070f); // оранжевый
-		        break;
-		      case 8:
-		        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-		        break;
-		      default:
-		        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-		        break;
-		    }
-
-		    return color;
+		setColor(gl, min, max, value);
 	}
 	
-	private static int setColorThermal(GL2 gl, double value) {
+	private static void setColorThermal(GL2 gl, double value) {
 	    // TODO WARM COLOR CALC
-	    double maxT = 400;
-	    double minT = 300;
+	    double max = 400;
+	    double min = 300;
 	    
-	    double step = (maxT - minT) / 9.0f;
-	    int color = 0;
-
-	    for (double st = minT + step; color < 9; st += step, color++)
-	      if (Math.abs(value) <= Math.abs(st)) {
-	        break;
-	      }
-
-	    switch (color) {
-	      case 0:
-	        gl.glColor3f(0.0f, 0.0f, 1.0f); // синий
-	        break;
-	      case 1:
-	        gl.glColor3f(0.078f, 0.482f, 0.98f); // светлосиний
-	        break;
-	      case 2:
-	        gl.glColor3f(0.086f, 0.906f, 0.973f); // голубой
-	        break;
-	      case 3:
-	        gl.glColor3f(0.094f, 0.961f, 0.573f); // голубоватый
-	        break;
-	      case 4:
-	        gl.glColor3f(0.0f, 1.0f, 0.0f); // зелёный
-	        break;
-	      case 5:
-	        gl.glColor3f(0.62f, 0.984f, 0.075f); // зеленоватый
-	        break;
-	      case 6:
-	        gl.glColor3f(0.957f, 0.98f, 0.078f); // желтый
-	        break;
-	      case 7:
-	        gl.glColor3f(0.988f, 0.667f, 0.070f); // оранжевый
-	        break;
-	      case 8:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	      default:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	    }
-
-	    return color;
-	  }
+	    setColor(gl, min, max, value);
+	}
 
 	public static void plotStrainEnergyResult(GL2 gl, Position position,
 			StaticDeformationAlalysis analysis) throws Exception {
@@ -755,53 +612,12 @@ public class GLPainterHelper {
 	}
 	
 	
-private static int setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
+private static void setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
 	    
 	    double min = result.getMinStrainEnergy(); 
 	    double max = result.getMaxStrainEnergy();
 	        
-	    double step = (max - min) / 9.0f;
-	    int color = 0;
-
-	    for (double st = min + step; color < 9; st += step, color++)
-	      if (value <= st) {
-	        break;
-	      }
-
-	    switch (color) {
-	      case 0:
-	        gl.glColor3f(0.0f, 0.0f, 1.0f); // синий
-	        break;
-	      case 1:
-	        gl.glColor3f(0.078f, 0.482f, 0.98f); // светлосиний
-	        break;
-	      case 2:
-	        gl.glColor3f(0.086f, 0.906f, 0.973f); // голубой
-	        break;
-	      case 3:
-	        gl.glColor3f(0.094f, 0.961f, 0.573f); // голубоватый
-	        break;
-	      case 4:
-	        gl.glColor3f(0.0f, 1.0f, 0.0f); // зелёный
-	        break;
-	      case 5:
-	        gl.glColor3f(0.62f, 0.984f, 0.075f); // зеленоватый
-	        break;
-	      case 6:
-	        gl.glColor3f(0.957f, 0.98f, 0.078f); // желтый
-	        break;
-	      case 7:
-	        gl.glColor3f(0.988f, 0.667f, 0.070f); // оранжевый
-	        break;
-	      case 8:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	      default:
-	        gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
-	        break;
-	    }
-
-	    return color;
+	    setColor(gl, min, max, value);
 }
 
 public static void plotStructalTemperatureResult(GL2 gl, Position position,
@@ -893,12 +709,16 @@ private static void DrawGLColor3fStructalTemperature(GL2 gl, Node node, StaticDe
 	setColorStructalTempereature(gl, v, analysis.getResult());
 }
 
-private static int setColorStructalTempereature(GL2 gl, double value, StaticStructuralResult result) {
-    
+private static void setColorStructalTempereature(GL2 gl, double value, StaticStructuralResult result) {
+	
     double min = result.getMinTemperature(); 
     double max = result.getMaxTemperature();
     
-    double step = (max - min) / 9.0f;
+    setColor(gl, min, max, value);
+}
+
+private static void setColor(GL2 gl, double min, double max, double value) {
+	double step = (max - min) / 9.0f;
     int color = 0;
 
     for (double st = min + step; color < 9; st += step, color++)
@@ -938,8 +758,6 @@ private static int setColorStructalTempereature(GL2 gl, double value, StaticStru
         gl.glColor3f(1.0f, 0.0f, 0.0f); // красный
         break;
     }
-
-    return color;
 }
 
 }
