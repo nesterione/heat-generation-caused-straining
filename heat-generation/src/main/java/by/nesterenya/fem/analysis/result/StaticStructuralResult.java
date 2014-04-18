@@ -5,25 +5,15 @@ import java.util.Map;
 
 import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
-import static java.lang.Math.*;
 
 //TODO Возможно следует разместить тип результата в отдельные объекты
 public class StaticStructuralResult implements Result {
 	
-	private Temperature[] temperatures;
-	
-	public StaticStructuralResult(Map<Node, Deformation> deformations, Map<Element, Strain> strains, Map<Element, StrainEnergy> strainEnergies) {
+	public StaticStructuralResult(Map<Node, Deformation> deformations, Map<Element, Strain> strains, Map<Element, StrainEnergy> strainEnergies, Map<Node, Temperature> temperatures ) {
 		setDeformations(deformations);
 		setStrains(strains);
 		setStrainEnergies(strainEnergies);
-	}
-
-	public Temperature[] getTemperatures() {
-		return temperatures;
-	}
-
-	public void setTemperatures(Temperature[] temperatures) {
-		this.temperatures = temperatures;
+		setTemperatures(temperatures);
 	}
 
 	private double maxOfThree(double x, double y, double z) {
@@ -34,7 +24,6 @@ public class StaticStructuralResult implements Result {
 			return y;
 		return z;
 	}
-	
 	
 	//
 	// Deformations
@@ -265,5 +254,61 @@ public double getMinNodalStrain() {
 
 	public void setStrainEnergies(Map<Element, StrainEnergy> strainEnergies) {
 		this.strainEnergies = strainEnergies;
+	}
+	
+	//
+	// Strain Temperature
+	//
+	private Map<Node, Temperature> temperatures;
+	private Double minTemperature = null;
+	private Double maxTemperature = null;
+	
+	public double getMinTemperature() {
+		
+		if(minTemperature==null) {
+			
+			Collection<Temperature> strs = temperatures.values();
+			double min = Double.MAX_VALUE;
+			
+			for(Temperature str : strs ) {
+				double current = str.getValue();
+				if(min> current) {
+					min = current;
+				}
+			}
+			
+			minTemperature = min;
+		}
+		
+		return minTemperature;
+	}
+	
+	public double getMaxTemperature() {
+		
+		if(maxTemperature==null) {
+			
+			Collection<Temperature> strs = temperatures.values();
+			double max = Double.MIN_VALUE;
+			
+			for(Temperature str : strs ) {
+				double current = str.getValue();
+				if(max < current) {
+					max = current;
+				}
+			}
+			maxTemperature = max;
+			//TODO убрать
+			System.out.println("Temperature >" + maxTemperature);
+		}
+		
+		return maxTemperature;
+	}
+	
+	public Temperature getTemperature(Node node) {
+		return temperatures.get(node);
+	}
+
+	public void setTemperatures(Map<Node, Temperature> temperatures) {
+		this.temperatures = temperatures;
 	}
 }

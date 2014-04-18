@@ -368,6 +368,41 @@ public class StaticDeformationSolver {
 		return strainEnergies;
 	}
 	
+	//TODO Add capacity to collections for init
+	private Map<Node, Temperature> evaluateStrainTempereature(Map<Element, StrainEnergy> energies) throws Exception {
+		
+		Map<Node, Temperature> temperatures = new HashMap<>();
+		List<Element> elements = analysis.getMesh().getElements();
+		
+		for (Element element : elements) {
+			
+			Material material = (Material) element.getMatherial();
+
+			double energy = energies.get(element).getValue();
+			double c = material.getSpecificHeatCapacity();
+			double ro = material.getDensity();
+			
+			//Dou't need Volume of element because strain energy already for volume
+			double Cv = c*ro;
+			double dT = energy/Cv;
+			
+			for(int i =0;i< COUNT_NODES; i++) {
+				
+				Node node = element.getNode(i);
+				
+				if(temperatures.containsKey(node)) {
+					Temperature t = temperatures.get(node);
+					double newVal = (t.getValue()+ dT)/2;
+					t.setValue(newVal);
+				} else {
+					temperatures.put(node, new Temperature(dT));
+				}
+			}
+		}
+		
+		return temperatures;
+	}
+	
 	public void Solve() throws Exception {
 		
 		double[][] gK = formGlobalK();
@@ -381,48 +416,11 @@ public class StaticDeformationSolver {
 		Map<Element, Strain> strains = evaluateStrainResult(deformations);
 		Map<Node, NodalStrain> nodalStrains = evaluateNodalStrainResult(strains);
 		Map<Element, StrainEnergy> strainEnergies = evaluateStrainEnergyResult(deformations);
+		Map<Node, Temperature> temperatures = evaluateStrainTempereature(strainEnergies);
 		
-		List<Element> elements = analysis.getMesh().getElements();
-		int nodeSize = analysis.getMesh().getNodes().size();
-	
-		//DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
-		Temperature[] temperatures = new Temperature[nodeSize];
-		
-		for (Element element : elements) {
-			
-			Material material = (Material) element.getMatherial();
-
-			//TODO loop
-		    double energy = 1;
-			
-			//
-			// Calculation Strain Temperature
-			//
-			double c = material.getSpecificHeatCapacity();
-			double ro = material.getDensity();
-			//TODO выяснить или нужент тут объем
-			double Cv = c*ro/**Ve*/;
-			
-			double dT = energy/Cv;
-			
-			for(int i =0;i< COUNT_NODES; i++) {
-				
-				int ind_sj = element.getNode(i).getGlobalIndex();
-				
-				//если значение в узле нету
-				if(temperatures[ind_sj] == null) {
-					temperatures[ind_sj] = new Temperature(dT);
-				} else {
-					double nt = (temperatures[ind_sj].getValue() + dT)/2.0;
-					temperatures[ind_sj] = new Temperature(nt);
-				}
-			}
-			
-		}
-		
-		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergies);
+		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergies,temperatures);
 		res.setDeformationInNode(nodalStrains);
-		res.setTemperatures(temperatures);
+		
 		analysis.setResult(res);
 	}
 }

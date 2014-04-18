@@ -888,36 +888,16 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
 }
 
 private static void DrawGLColor3fStructalTemperature(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
-	int indexElement = node.getGlobalIndex();
-	
-	double v = analysis.getResult().getTemperatures()[indexElement].getValue();
+	double v = analysis.getResult().getTemperature(node).getValue();
 	
 	setColorStructalTempereature(gl, v, analysis.getResult());
 }
 
 private static int setColorStructalTempereature(GL2 gl, double value, StaticStructuralResult result) {
     
-	Temperature[] temperatures = result.getTemperatures();
-	//TODO Оптимизировать, без лишних пересчетов
-    double min = Math.abs(temperatures[0].getValue()); 
-    double max = Math.abs(temperatures[0].getValue());
+    double min = result.getMinTemperature(); 
+    double max = result.getMaxTemperature();
     
-    for(int i= 0;i<temperatures.length;i++) {
-    	
-    	double curValue = Math.abs(temperatures[i].getValue());
-    	
-      if(min> curValue) {
-        min = curValue;
-      }
-      if(max< curValue) {
-        max = curValue;
-      }
-    }
-    
-    value = Math.abs(value);
-    
-   //System.out.println(max);
-   
     double step = (max - min) / 9.0f;
     int color = 0;
 
