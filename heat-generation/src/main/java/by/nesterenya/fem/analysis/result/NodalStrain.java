@@ -1,9 +1,9 @@
 package by.nesterenya.fem.analysis.result;
 
-public class DeformationInNode {
+public class NodalStrain {
 	private double value;
 	
-	public DeformationInNode(double value) {
+	public NodalStrain(double value) {
 		setValue(value);
 	}
 

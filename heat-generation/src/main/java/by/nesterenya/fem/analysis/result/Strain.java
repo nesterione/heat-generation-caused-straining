@@ -1,5 +1,8 @@
 package by.nesterenya.fem.analysis.result;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+
 /**
  * Strain of 3d element like of thetraid
  * keep six components of strain
@@ -22,6 +25,26 @@ public class Strain {
 		setYxy(y_xy);
 		setYxz(y_xz);
 		setYyz(y_yz);
+	}
+	
+	public double evalTotalStrain() {
+		
+		//Maximum principal
+		double e1_max = (ex + ey)/2 + sqrt( pow((ex+ey)/2,2) + pow(y_xy/2,2));
+		double e2_max = (ey + ez)/2 + sqrt( pow((ey+ez)/2,2) + pow(y_yz/2,2));
+		double e3_max = (ex + ez)/2 + sqrt( pow((ex+ez)/2,2) + pow(y_xz/2,2));
+		
+		//Minimum principal
+		double e1_min = (ex + ey)/2 - sqrt( pow((ex+ey)/2,2) + pow(y_xy/2,2));
+		double e2_min = (ey + ez)/2 - sqrt( pow((ey+ez)/2,2) + pow(y_yz/2,2));
+		double e3_min = (ex + ez)/2 - sqrt( pow((ex+ez)/2,2) + pow(y_xz/2,2));
+		
+		//Maximum Shear
+		double ms_1 = e1_max-e1_min;
+		double ms_2 = e2_max-e2_min;
+		double ms_3 = e3_max-e3_min;
+			
+		return ms_1+ms_2+ms_3;
 	}
 	
 	public double getEx() {
@@ -60,8 +83,5 @@ public class Strain {
 	public void setYyz(double y_yz) {
 		this.y_yz = y_yz;
 	}
-	
-	
-	
-	
+
 }

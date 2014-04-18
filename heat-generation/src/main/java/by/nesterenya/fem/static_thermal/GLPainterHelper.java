@@ -484,15 +484,11 @@ public class GLPainterHelper {
 		setColorStraining(gl, vectorOfDeformation, analysis.getResult());
 	}
 	
-	private static void DrawGLColor3fStrainInNode(GL2 gl, Node node, StaticDeformationAlalysis analysis) {
-		int indexElement = node.getGlobalIndex();
-		
-		double v = analysis.getResult().getDeformationInNode()[indexElement].getValue();
-		
+	private static void DrawGLColor3fStrainInNode(GL2 gl, Node node, StaticDeformationAlalysis analysis) {	
+		double v = analysis.getResult().getNodadStrain(node);
+
 		setColorStraining(gl, v, analysis.getResult());
 	}
-	
-	
 	
 	// TODO Может быть переместить в лучшее место, может методы расширения а лучьше Dependesy Injecton
 	private static void drawGLVertex3d_deformation(GL2 gl, Node node, StaticDeformationAlalysis analysis) throws Exception {
@@ -532,7 +528,7 @@ public class GLPainterHelper {
 	}
 	
 	private static int setColorStraining(GL2 gl, double value, StaticStructuralResult result) {
-	    
+	    //TODO potencial error, when draw Nodal Strain I don't get max/min values NodalSrain
 	    double min = result.getMinStrain(); 
 	    double max = result.getMaxStrain();
 	    

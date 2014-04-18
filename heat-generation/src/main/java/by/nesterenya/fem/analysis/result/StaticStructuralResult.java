@@ -11,16 +11,6 @@ import static java.lang.Math.*;
 //TODO Возможно следует разместить тип результата в отдельные объекты
 public class StaticStructuralResult implements Result {
 	
-	private Double minDeformation = null;
-	private Double maxDeformation = null;
-	
-	private Double minStrain = null;
-	private Double maxStrain = null;
-	
-	private Map<Node, Deformation> deformations;
-	private Map<Element, Strain> strains;
-	
-	private DeformationInNode[] deformationInNode;
 	private StrainEnergy[] strainEnergy;
 	private Temperature[] temperatures;
 	
@@ -28,14 +18,6 @@ public class StaticStructuralResult implements Result {
 		setDeformations(deformations);
 		setStrains(strains);
 		setStrainEnergy(strainEnergy);
-	}
-
-	public DeformationInNode[] getDeformationInNode() {
-		return deformationInNode;
-	}
-
-	public void setDeformationInNode(DeformationInNode[] deformationInNode) {
-		this.deformationInNode = deformationInNode;
 	}
 
 	public StrainEnergy[] getStrainEnergy() {
@@ -67,6 +49,10 @@ public class StaticStructuralResult implements Result {
 	//
 	// Deformations
 	//
+	private Map<Node, Deformation> deformations;
+	private Double minDeformation = null;
+	private Double maxDeformation = null;
+	
 	public double getMinDeformation() {
 		
 		if(minDeformation==null) {
@@ -120,32 +106,9 @@ public class StaticStructuralResult implements Result {
 	//
 	// Strains
 	//
-	private double evalTotalStrain(Strain strain) {
-
-		double ex = strain.getEx();
-		double ey = strain.getEy();
-		double ez = strain.getEz();
-		double yxy = strain.getYxy();
-		double yyz= strain.getYyz();
-		double yxz = strain.getYxz();
-		
-		//Maximum principal
-		double e1_max = (ex + ey)/2 + sqrt( pow((ex+ey)/2,2) + pow(yxy/2,2));
-		double e2_max = (ey + ez)/2 + sqrt( pow((ey+ez)/2,2) + pow(yyz/2,2));
-		double e3_max = (ex + ez)/2 + sqrt( pow((ex+ez)/2,2) + pow(yxz/2,2));
-		
-		//Minimum principal
-		double e1_min = (ex + ey)/2 - sqrt( pow((ex+ey)/2,2) + pow(yxy/2,2));
-		double e2_min = (ey + ez)/2 - sqrt( pow((ey+ez)/2,2) + pow(yyz/2,2));
-		double e3_min = (ex + ez)/2 - sqrt( pow((ex+ez)/2,2) + pow(yxz/2,2));
-		
-		//Maximum Shear
-		double ms_1 = (e1_max-e1_min);
-		double ms_2 = (e2_max-e2_min);
-		double ms_3 = (e3_max-e3_min);
-		
-		return ms_1+ms_2+ms_3;
-	}
+	private Map<Element, Strain> strains;
+	private Double minStrain = null;
+	private Double maxStrain = null;
 	
 	public double getMinStrain() {
 		
@@ -155,7 +118,7 @@ public class StaticStructuralResult implements Result {
 			double min = Double.MAX_VALUE;
 			
 			for(Strain str : strs ) {
-				double current = evalTotalStrain(str);
+				double current = str.evalTotalStrain();
 				if(min> current) {
 					min = current;
 				}
@@ -175,7 +138,7 @@ public class StaticStructuralResult implements Result {
 			double max = Double.MIN_VALUE;
 			
 			for(Strain str : strs ) {
-				double current = evalTotalStrain(str);
+				double current = str.evalTotalStrain();
 				if(max < current) {
 					max = current;
 				}
@@ -194,10 +157,67 @@ public class StaticStructuralResult implements Result {
 	
 	public double getTotalStrain(Element element) {
 		Strain strain = strains.get(element);
-		return evalTotalStrain(strain);
+		return strain.evalTotalStrain();
 	}
 
 	public void setStrains(Map<Element, Strain> strains) {
 		this.strains = strains;
+	}
+	
+	
+	//
+	// Nodal Strain
+	// 
+	private Map<Node, NodalStrain> nodalStrains;
+	private Double minNodalStrain = null;
+	private Double maxNodalStrain = null;
+	
+public double getMinNodalStrain() {
+		
+		if(minNodalStrain==null) {
+			
+			Collection<NodalStrain> strs = nodalStrains.values();
+			double min = Double.MAX_VALUE;
+			
+			for(NodalStrain str : strs ) {
+				double current = str.getValue();
+				if(min> current) {
+					min = current;
+				}
+			}
+			
+			minNodalStrain = min;
+		}
+		
+		return minNodalStrain;
+	}
+	
+	public double getMaxNodalStrain() {
+		
+		if(maxNodalStrain==null) {
+			
+			Collection<NodalStrain> strs = nodalStrains.values();
+			double max = Double.MIN_VALUE;
+			
+			for(NodalStrain str : strs ) {
+				double current = str.getValue();
+				if(max < current) {
+					max = current;
+				}
+			}
+			maxNodalStrain = max;
+			//TODO убрать
+			System.out.println("Nodal Strain >" + maxNodalStrain);
+		}
+		
+		return maxNodalStrain;
+	}
+	
+	public double getNodadStrain(Node node) {
+		return nodalStrains.get(node).getValue();
+	}
+
+	public void setDeformationInNode(Map<Node, NodalStrain> nodalStrains) {
+		this.nodalStrains = nodalStrains;
 	}
 }

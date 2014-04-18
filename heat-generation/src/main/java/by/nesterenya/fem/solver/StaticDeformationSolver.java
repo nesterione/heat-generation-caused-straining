@@ -6,7 +6,7 @@ import java.util.Map;
 
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
 import by.nesterenya.fem.analysis.result.Deformation;
-import by.nesterenya.fem.analysis.result.DeformationInNode;
+import by.nesterenya.fem.analysis.result.NodalStrain;
 import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
@@ -19,6 +19,8 @@ import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.element.material.Material;
 import static by.nesterenya.fem.solver.MMath.*;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 
 public class StaticDeformationSolver {
 	
@@ -310,6 +312,35 @@ public class StaticDeformationSolver {
 		return strains;
 	}
 	
+	/**
+	 * form values of equivalent of strain in nodes
+	 * TODO maybe to delete COUNT_NODES and other and move it into appropriate classes
+	 * @throws Exception 
+	 */
+	private Map<Node, NodalStrain> evaluateNodalStrainResult(Map<Element, Strain> strains) throws Exception {
+		
+		Map<Node, NodalStrain> nodalStrains = new HashMap<>();
+		
+		for(Element element : analysis.getMesh().getElements()) {
+			
+			Strain strain = strains.get(element);
+			for(int i =0;i< COUNT_NODES; i++) {
+				
+				Node node = element.getNode(i);
+				
+				if(nodalStrains.containsKey(node)) {
+					NodalStrain nodalStrain = nodalStrains.get(node);
+					double newVal = nodalStrain.getValue() + strain.evalTotalStrain()/2;
+					nodalStrain.setValue(newVal);
+				}
+				
+				nodalStrains.put(node, new NodalStrain(strain.evalTotalStrain()));
+			}
+		}
+		
+		return nodalStrains;
+	}
+	
 	public void Solve() throws Exception {
 		
 		double[][] gK = formGlobalK();
@@ -321,9 +352,7 @@ public class StaticDeformationSolver {
 				
 		Map<Node, Deformation> deformations = evaluateDeformationResult(result);
 		Map<Element, Strain> strains = evaluateStrainResult(deformations);
-		
-		
-		
+		Map<Node, NodalStrain> nodalStrains = evaluateNodalStrainResult(strains);
 		
 		List<Element> elements = analysis.getMesh().getElements();
 		int nodeSize = analysis.getMesh().getNodes().size();
@@ -350,25 +379,7 @@ public class StaticDeformationSolver {
 				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations.get(node).getZ();
 			}
 		
-			
-		
-		
-			//form values of ecvivalent of deformation in nodes
-			/*for(int i =0;i< COUNT_NODES; i++) {
-				int ind_sj = element.getNode(i).getGlobalIndex();
-				
-				double eInNode = e_e[0]+e_e[1]+e_e[2];
-				
-				//если значение в узле нету
-				if(defInNodes[ind_sj] == null) {
-					defInNodes[ind_sj] = new DeformationInNode(eInNode);
-				} else {
-					double nDef = (defInNodes[ind_sj].getValue() + eInNode)/2.0;
-					defInNodes[ind_sj] = new DeformationInNode(nDef);
-				}
-				
-			}*/
-			
+
 			//
 			// Calculation strain energy
 			//
@@ -441,7 +452,7 @@ public class StaticDeformationSolver {
 		}
 		
 		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergy);
-		//res.setDeformationInNode(defInNodes);
+		res.setDeformationInNode(nodalStrains);
 		res.setTemperatures(temperatures);
 		analysis.setResult(res);
 	}
