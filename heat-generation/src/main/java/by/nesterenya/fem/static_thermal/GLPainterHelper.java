@@ -69,26 +69,10 @@ public class GLPainterHelper {
 	    gl.glBegin(GL.GL_TRIANGLES);
 	    List<Element> elements = mesh.getElements();
 	    for (Element element : elements) {
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-
-	      drawGlVertex3d(gl,node0);
-	      drawGlVertex3d(gl,node1);
-	      drawGlVertex3d(gl,node2);
-
-	      drawGlVertex3d(gl,node0);
-	      drawGlVertex3d(gl,node1);
-	      drawGlVertex3d(gl,node3);
-
-	      drawGlVertex3d(gl,node1);
-	      drawGlVertex3d(gl,node2);
-	      drawGlVertex3d(gl,node3);
-
-	      drawGlVertex3d(gl,node0);
-	      drawGlVertex3d(gl,node2);
-	      drawGlVertex3d(gl,node3);
+	    	for(int i = 0; i< orderNodesTet.length; i++) {
+		    	  Node node = element.getNode(orderNodesTet[i]);
+		    	  drawGlVertex3d(gl,node);
+	    	}
 	    }
 	    gl.glEnd();
 
@@ -200,38 +184,11 @@ public class GLPainterHelper {
 	    List<Element> elements = analysis.getMesh().getElements();
 	    for (Element element : elements) {
 	    
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-
-	      DrawGLColor3f(gl, node0, analysis);
-	      drawGlVertex3d(gl,node0);
-	      DrawGLColor3f(gl,node1, analysis);
-	      drawGlVertex3d(gl,node1);
-	      DrawGLColor3f(gl,node2, analysis);
-	      drawGlVertex3d(gl,node2);
-
-	      DrawGLColor3f(gl,node0, analysis);
-	      drawGlVertex3d(gl,node0);
-	      DrawGLColor3f(gl,node1, analysis);
-	      drawGlVertex3d(gl,node1);
-	      DrawGLColor3f(gl,node3, analysis);
-	      drawGlVertex3d(gl,node3);
-
-	      DrawGLColor3f(gl,node1, analysis);
-	      drawGlVertex3d(gl,node1);
-	      DrawGLColor3f(gl,node2, analysis);
-	      drawGlVertex3d(gl,node2);
-	      DrawGLColor3f(gl,node3, analysis);
-	      drawGlVertex3d(gl,node3);
-
-	      DrawGLColor3f(gl,node0, analysis);
-	      drawGlVertex3d(gl,node0);
-	      DrawGLColor3f(gl,node2, analysis);
-	      drawGlVertex3d(gl,node2);
-	      DrawGLColor3f(gl,node3, analysis);
-	      drawGlVertex3d(gl,node3);
+	    	for(int i = 0; i< orderNodesTet.length; i++) {
+		    	  Node node = element.getNode(orderNodesTet[i]);
+		    	  DrawGLColor3f(gl, node, analysis);
+		    	  drawGlVertex3d(gl,node);
+	    	}
 	    }
 	    gl.glEnd();
 
@@ -279,39 +236,13 @@ public class GLPainterHelper {
 	    List<Element> elements = analysis.getMesh().getElements();
 	    for (Element element : elements) {
 
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-	     
-	      DrawGLColor3fStruct(gl, node0, analysis);
-	      drawGLVertex3d_deformation(gl, node0, analysis);
-	      DrawGLColor3fStruct(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStruct(gl,node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-
-	      DrawGLColor3fStruct(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      DrawGLColor3fStruct(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStruct(gl,node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
-
-	      DrawGLColor3fStruct(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStruct(gl,node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);  
-	      DrawGLColor3fStruct(gl,node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
-
-	      DrawGLColor3fStruct(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node0, analysis);  
-	      DrawGLColor3fStruct(gl,node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-	      DrawGLColor3fStruct(gl,node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
+	    	for(int i = 0; i< orderNodesTet.length; i++) {
+		    	  Node node = element.getNode(orderNodesTet[i]);
+		    	  DrawGLColor3fStruct(gl, node, analysis);
+		    	  drawGLVertex3d_deformation(gl, node, analysis);
+	    	}
 	    }
+	    
 	    gl.glEnd();
 
 	    gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2GL3.GL_FILL);
@@ -357,31 +288,13 @@ public class GLPainterHelper {
 	    gl.glBegin(GL.GL_TRIANGLES);
 	    List<Element> elements = analysis.getMesh().getElements();
 	    for (Element element : elements) {
-
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-	     
-	      
-	      //Strain for all element
-	      DrawGLColor3fStrain(gl, element, analysis);
-	      
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
-
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);  
-	      drawGLVertex3d_deformation(gl,node3, analysis);
- 
-	      drawGLVertex3d_deformation(gl,node0, analysis);  
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
+	    	
+	    	//Strain for all element
+		    DrawGLColor3fStrain(gl, element, analysis);
+	    	for(int i = 0; i< orderNodesTet.length; i++) {
+		    	  Node node = element.getNode(orderNodesTet[i]);
+		    	  drawGLVertex3d_deformation(gl,node, analysis);
+	    	}
 	    }
 	    gl.glEnd();
 
@@ -392,6 +305,7 @@ public class GLPainterHelper {
 	    gl.glDisable(GL2ES1.GL_ALPHA_TEST);
 	    gl.glFlush();
 	}
+	
 	
 	
 	public static void plotStrainInNodesResult(GL2 gl, Position position, StaticDeformationAlalysis analysis) throws Exception {
@@ -430,41 +344,11 @@ public class GLPainterHelper {
 	    List<Element> elements = analysis.getMesh().getElements();
 	    for (Element element : elements) {
 
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-	     
-	      
-	      //Strain for all element
-	     
-	      DrawGLColor3fStrainInNode(gl, node0, analysis);
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      DrawGLColor3fStrainInNode(gl, node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStrainInNode(gl, node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-
-	      DrawGLColor3fStrainInNode(gl, node0, analysis);
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      DrawGLColor3fStrainInNode(gl, node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStrainInNode(gl, node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
-
-	      DrawGLColor3fStrainInNode(gl, node1, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      DrawGLColor3fStrainInNode(gl, node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-	      DrawGLColor3fStrainInNode(gl, node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
- 
-	      DrawGLColor3fStrainInNode(gl, node0, analysis);
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      DrawGLColor3fStrainInNode(gl, node2, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-	      DrawGLColor3fStrainInNode(gl, node3, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
+	    	for(int i = 0; i< orderNodesTet.length; i++) {
+		    	  Node node = element.getNode(orderNodesTet[i]);
+		    	  DrawGLColor3fStrainInNode(gl, node, analysis);
+			      drawGLVertex3d_deformation(gl,node, analysis);
+	    	}
 	    }
 	    gl.glEnd();
 
@@ -571,30 +455,13 @@ public class GLPainterHelper {
 	    gl.glBegin(GL.GL_TRIANGLES);
 	    List<Element> elements = analysis.getMesh().getElements();
 	    for (Element element : elements) {
-
-	      Node node0 = element.getNode(0);
-	      Node node1 = element.getNode(1);
-	      Node node2 = element.getNode(2);
-	      Node node3 = element.getNode(3);
-	     
+	    	
 	      //Strain for all element
 	      DrawGLColor3fEnergy(gl, element, analysis);
-	      
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-
-	      drawGLVertex3d_deformation(gl,node0, analysis);
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
-
-	      drawGLVertex3d_deformation(gl,node1, analysis);
-	      drawGLVertex3d_deformation(gl,node2, analysis);  
-	      drawGLVertex3d_deformation(gl,node3, analysis);
- 
-	      drawGLVertex3d_deformation(gl,node0, analysis);  
-	      drawGLVertex3d_deformation(gl,node2, analysis);
-	      drawGLVertex3d_deformation(gl,node3, analysis);
+	      for(int i = 0; i< orderNodesTet.length; i++) {
+	    	  Node node = element.getNode(orderNodesTet[i]);
+	    	  drawGLVertex3d_deformation(gl,node, analysis);
+	      }
 	    }
 	    gl.glEnd();
 
@@ -611,16 +478,17 @@ public class GLPainterHelper {
 		setColorEnergy(gl, strainEnergy.getValue(), analysis.getResult());
 	}
 	
+	private static int[] orderNodesTet = {0,1,2,0,1,3,1,2,3,0,2,3};
 	
-private static void setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
-	    
-	    double min = result.getMinStrainEnergy(); 
-	    double max = result.getMaxStrainEnergy();
-	        
-	    setColor(gl, min, max, value);
-}
+	private static void setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
+		    
+		double min = result.getMinStrainEnergy(); 
+		double max = result.getMaxStrainEnergy();
+		        
+		setColor(gl, min, max, value);
+	}
 
-public static void plotStructalTemperatureResult(GL2 gl, Position position,
+	public static void plotStructalTemperatureResult(GL2 gl, Position position,
 		StaticDeformationAlalysis analysis) throws Exception {
 	gl.glTranslatef(0.0f, 0.0f, -6.0f);
 
@@ -657,41 +525,11 @@ public static void plotStructalTemperatureResult(GL2 gl, Position position,
     List<Element> elements = analysis.getMesh().getElements();
     for (Element element : elements) {
 
-      Node node0 = element.getNode(0);
-      Node node1 = element.getNode(1);
-      Node node2 = element.getNode(2);
-      Node node3 = element.getNode(3);
-     
-      
-      //Strain for all element
-     
-      DrawGLColor3fStructalTemperature(gl, node0, analysis);
-      drawGLVertex3d_deformation(gl,node0, analysis);
-      DrawGLColor3fStructalTemperature(gl, node1, analysis);
-      drawGLVertex3d_deformation(gl,node1, analysis);
-      DrawGLColor3fStructalTemperature(gl, node2, analysis);
-      drawGLVertex3d_deformation(gl,node2, analysis);
-
-      DrawGLColor3fStructalTemperature(gl, node0, analysis);
-      drawGLVertex3d_deformation(gl,node0, analysis);
-      DrawGLColor3fStructalTemperature(gl, node1, analysis);
-      drawGLVertex3d_deformation(gl,node1, analysis);
-      DrawGLColor3fStructalTemperature(gl, node3, analysis);
-      drawGLVertex3d_deformation(gl,node3, analysis);
-
-      DrawGLColor3fStructalTemperature(gl, node1, analysis);
-      drawGLVertex3d_deformation(gl,node1, analysis);
-      DrawGLColor3fStructalTemperature(gl, node2, analysis);
-      drawGLVertex3d_deformation(gl,node2, analysis);
-      DrawGLColor3fStructalTemperature(gl, node3, analysis);
-      drawGLVertex3d_deformation(gl,node3, analysis);
-
-      DrawGLColor3fStructalTemperature(gl, node0, analysis);
-      drawGLVertex3d_deformation(gl,node0, analysis);
-      DrawGLColor3fStructalTemperature(gl, node2, analysis);
-      drawGLVertex3d_deformation(gl,node2, analysis);
-      DrawGLColor3fStructalTemperature(gl, node3, analysis);
-      drawGLVertex3d_deformation(gl,node3, analysis);
+    	for(int i = 0; i< orderNodesTet.length; i++) {
+	    	  Node node = element.getNode(orderNodesTet[i]);
+	    	  DrawGLColor3fStructalTemperature(gl, node, analysis);
+	          drawGLVertex3d_deformation(gl,node, analysis);
+    	}
     }
     gl.glEnd();
 
