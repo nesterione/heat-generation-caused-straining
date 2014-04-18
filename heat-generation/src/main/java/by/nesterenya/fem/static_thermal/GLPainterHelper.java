@@ -750,36 +750,15 @@ public class GLPainterHelper {
 	}
 
 	private static void DrawGLColor3fEnergy(GL2 gl, Element element, StaticDeformationAlalysis analysis) {
-		int indexElement = element.getGlobalIndex();
-		
-		StrainEnergy strainEnergy = analysis.getResult().getStrainEnergy()[indexElement];
-		
-		
+		StrainEnergy strainEnergy = analysis.getResult().getStrainEnergy(element);		
 		setColorEnergy(gl, strainEnergy.getValue(), analysis.getResult());
 	}
 	
 	
 private static int setColorEnergy(GL2 gl, double value, StaticStructuralResult result) {
 	    
-		StrainEnergy[] strainEnergies = result.getStrainEnergy();
-		//TODO Оптимизировать, без лишних пересчетов
-	    double min = Math.abs(strainEnergies[0].getValue()); 
-	    double max = Math.abs(strainEnergies[0].getValue());
-	    
-	    for(int i= 0;i<strainEnergies.length;i++) {
-	    	
-	      double curValue = Math.abs(strainEnergies[i].getValue());
-	    	
-	      if(min> curValue) {
-	        min = curValue;
-	      }
-	      if(max< curValue) {
-	        max = curValue;
-	      }
-	      
-	    }
-	    
-	    value = Math.abs(value);
+	    double min = result.getMinStrainEnergy(); 
+	    double max = result.getMaxStrainEnergy();
 	        
 	    double step = (max - min) / 9.0f;
 	    int color = 0;

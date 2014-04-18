@@ -25,7 +25,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	//TODO сделать битовый вектор вместо этого перечисления
 	
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT, DEFORMATION, STRAIN, NODAL_STRAIN, ENERGY, TEMPERATURE
+	    MODEL, MESH, RESULT, MESHRESULT, DEFORMATION, STRAIN, NODAL_STRAIN, STRAIN_ENERGY, TEMPERATURE
 	  };
 	
 	private Box model;
@@ -119,7 +119,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	        		GLPainterHelper.plotStrainInNodesResult(gl, position, analysis_d);
 	        	}
 	        	break;
-	        case ENERGY:
+	        case STRAIN_ENERGY:
 	        	if(analysis_d!=null) {
 	        		GLPainterHelper.plotStrainEnergyResult(gl, position, analysis_d);
 	        	}

@@ -5,27 +5,17 @@ import java.util.Map;
 
 import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
-
 import static java.lang.Math.*;
 
 //TODO Возможно следует разместить тип результата в отдельные объекты
 public class StaticStructuralResult implements Result {
 	
-	private StrainEnergy[] strainEnergy;
 	private Temperature[] temperatures;
 	
-	public StaticStructuralResult(Map<Node, Deformation> deformations, Map<Element, Strain> strains, StrainEnergy[] strainEnergy) {
+	public StaticStructuralResult(Map<Node, Deformation> deformations, Map<Element, Strain> strains, Map<Element, StrainEnergy> strainEnergies) {
 		setDeformations(deformations);
 		setStrains(strains);
-		setStrainEnergy(strainEnergy);
-	}
-
-	public StrainEnergy[] getStrainEnergy() {
-		return strainEnergy;
-	}
-
-	public void setStrainEnergy(StrainEnergy[] strainEnergy) {
-		this.strainEnergy = strainEnergy;
+		setStrainEnergies(strainEnergies);
 	}
 
 	public Temperature[] getTemperatures() {
@@ -219,5 +209,61 @@ public double getMinNodalStrain() {
 
 	public void setDeformationInNode(Map<Node, NodalStrain> nodalStrains) {
 		this.nodalStrains = nodalStrains;
+	}
+	
+	//
+	// Strain Energy
+	//
+	Map<Element, StrainEnergy> strainEnergies;
+	private Double minStrainEnergy = null;
+	private Double maxStrainEnergy = null;
+	
+	public double getMinStrainEnergy() {
+		
+		if(minStrainEnergy==null) {
+			
+			Collection<StrainEnergy> strs = strainEnergies.values();
+			double min = Double.MAX_VALUE;
+			
+			for(StrainEnergy str : strs ) {
+				double current = str.getValue();
+				if(min> current) {
+					min = current;
+				}
+			}
+			
+			minStrainEnergy = min;
+		}
+		
+		return minStrainEnergy;
+	}
+	
+	public double getMaxStrainEnergy() {
+		
+		if(maxStrainEnergy==null) {
+			
+			Collection<StrainEnergy> strs = strainEnergies.values();
+			double max = Double.MIN_VALUE;
+			
+			for(StrainEnergy str : strs ) {
+				double current = str.getValue();
+				if(max < current) {
+					max = current;
+				}
+			}
+			maxStrainEnergy = max;
+			//TODO убрать
+			System.out.println("Strain Energy >" + maxStrainEnergy);
+		}
+		
+		return maxStrainEnergy;
+	}
+	
+	public StrainEnergy getStrainEnergy(Element element) {
+		return strainEnergies.get(element);
+	}
+
+	public void setStrainEnergies(Map<Element, StrainEnergy> strainEnergies) {
+		this.strainEnergies = strainEnergies;
 	}
 }

@@ -285,6 +285,19 @@ public class StaticDeformationSolver {
 		return deformations;
 	}
 	
+	private double[] evaluateElementsDeformations(Element element, Map<Node, Deformation> deformations) throws Exception {
+		double[] currentDeformations = new double[COUNT_NODES*DEGREES_OF_FREEDOM];
+		for(int i = 0; i < COUNT_NODES; i++) {
+			
+			Deformation deformation = deformations.get(element.getNode(i));
+			currentDeformations[i*DEGREES_OF_FREEDOM] = deformation.getX();
+			currentDeformations[i*DEGREES_OF_FREEDOM+1] = deformation.getY();
+			currentDeformations[i*DEGREES_OF_FREEDOM+2] = deformation.getZ();
+		}
+		
+		return currentDeformations;
+	}
+	
 	private Map<Element, Strain> evaluateStrainResult(Map<Node, Deformation> deformations) throws Exception {
 		
 		Map<Element, Strain> strains = new HashMap<>();
@@ -293,19 +306,9 @@ public class StaticDeformationSolver {
 		for (Element element : elements) {
 			
 			double[][] B  = formMatrixB(element);
-			
-			double[] currentDeformations = new double[COUNT_NODES*DEGREES_OF_FREEDOM];
-			for(int i = 0; i < COUNT_NODES; i++) {
-				
-				Deformation deformation = deformations.get(element.getNode(i));
-				currentDeformations[i*DEGREES_OF_FREEDOM] = deformation.getX();
-				currentDeformations[i*DEGREES_OF_FREEDOM+1] = deformation.getY();
-				currentDeformations[i*DEGREES_OF_FREEDOM+2] = deformation.getZ();
-			}
-			
+			double[] currentDeformations = evaluateElementsDeformations(element, deformations);
 			double[] e = MUL(B, currentDeformations);
 			Strain strain = new Strain(e[0], e[1], e[2], e[3], e[4], e[5]);
-			
 			strains.put(element, strain);
 		}
 		
@@ -341,6 +344,30 @@ public class StaticDeformationSolver {
 		return nodalStrains;
 	}
 	
+	/**
+	 *
+	 * energyValue = 0.5 * Ve* E * e*e;
+	 * or 0.5 * {res}^Т * [K] * {res}
+	 *	
+	 */
+	private Map<Element, StrainEnergy> evaluateStrainEnergyResult(Map<Node, Deformation> deformations) throws Exception {
+		
+		List<Element> elements = analysis.getMesh().getElements();
+		Map<Element, StrainEnergy> strainEnergies = new HashMap<>();
+		
+		for (Element element : elements) {
+			double[] res = evaluateElementsDeformations(element, deformations);
+			double[][] locK = formLocalK(element);
+			
+			double[] dd = MUL(res, locK);		
+			double energy = MUL(dd,res)*0.5;
+			
+			strainEnergies.put(element, new StrainEnergy(energy));
+		}
+		
+		return strainEnergies;
+	}
+	
 	public void Solve() throws Exception {
 		
 		double[][] gK = formGlobalK();
@@ -353,77 +380,20 @@ public class StaticDeformationSolver {
 		Map<Node, Deformation> deformations = evaluateDeformationResult(result);
 		Map<Element, Strain> strains = evaluateStrainResult(deformations);
 		Map<Node, NodalStrain> nodalStrains = evaluateNodalStrainResult(strains);
+		Map<Element, StrainEnergy> strainEnergies = evaluateStrainEnergyResult(deformations);
 		
 		List<Element> elements = analysis.getMesh().getElements();
 		int nodeSize = analysis.getMesh().getNodes().size();
-		StrainEnergy[] strainEnergy = new StrainEnergy[elements.size()];
+	
 		//DeformationInNode[] defInNodes = new DeformationInNode[nodeSize];
 		Temperature[] temperatures = new Temperature[nodeSize];
 		
-		//Calculation of Strain
-		
-		double[][] Q  = formMatrixQ();
-
 		for (Element element : elements) {
 			
-			// Tetr element has 4 nodes
-			final int COUNT_NODES_IN_ELEMENT = 4;
-			double[] curDeff = new double[DEGREES_OF_FREEDOM*COUNT_NODES_IN_ELEMENT];
-			
-			for(int i = 0; i < COUNT_NODES_IN_ELEMENT; i++) {
-				Node node = element.getNode(i);
-				int nodeNumber = node.getGlobalIndex();
-				
-				curDeff[i*DEGREES_OF_FREEDOM] = deformations.get(node).getX();
-				curDeff[i*DEGREES_OF_FREEDOM + 1] = deformations.get(node).getY();
-				curDeff[i*DEGREES_OF_FREEDOM + 2] = deformations.get(node).getZ();
-			}
-		
-
-			//
-			// Calculation strain energy
-			//
-			
-			//double energyValue = 0.5 * Ve* E * e*e;
-			// или 0.5 * {res}^Т * [K] * {res}
-				
-			double[] res = new double[COUNT_NODES * DEGREES_OF_FREEDOM];		
-			for(int i =0;i< COUNT_NODES;i++) {
-				res[i*DEGREES_OF_FREEDOM] = deformations.get(element.getNode(i)).getX();
-				res[i*DEGREES_OF_FREEDOM + 1] = deformations.get(element.getNode(i)).getY();
-				res[i*DEGREES_OF_FREEDOM + 2] = deformations.get(element.getNode(i)).getZ();
-			}
-			
-			
-			
-			//Формируем локальную матрицу жесткости
 			Material material = (Material) element.getMatherial();
 
-			// TODO WARM в параметрах
-			double[][] curE = formMatrixE(material.getElasticModulus(),
-					material.getPoissonsRatio());
-
-			// Формируем координатную матрицу для текущего элемента
-			double[][] AA = formMatrixA(element);
-					
-			double[][] BB = INV(AA);
-
-			double Ve = element.getVolume();
-
-			// Формирование локальной матрицы жесткости
-			double[][] KK;
-		    KK = MUL(T(BB), T(Q));
-			KK = MUL(KK, curE);
-			KK = MUL(KK, Q);
-			KK = MUL(KK, BB);
-			KK = MUL(KK, Ve);
-			
-			double[] dd = MUL(res, KK);
-			
-			double energy = MUL(dd,res)*0.5;
-			
-			strainEnergy[element.getGlobalIndex()] = new StrainEnergy(energy);
-		
+			//TODO loop
+		    double energy = 1;
 			
 			//
 			// Calculation Strain Temperature
@@ -435,11 +405,9 @@ public class StaticDeformationSolver {
 			
 			double dT = energy/Cv;
 			
-			
 			for(int i =0;i< COUNT_NODES; i++) {
 				
 				int ind_sj = element.getNode(i).getGlobalIndex();
-				
 				
 				//если значение в узле нету
 				if(temperatures[ind_sj] == null) {
@@ -449,9 +417,10 @@ public class StaticDeformationSolver {
 					temperatures[ind_sj] = new Temperature(nt);
 				}
 			}
+			
 		}
 		
-		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergy);
+		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergies);
 		res.setDeformationInNode(nodalStrains);
 		res.setTemperatures(temperatures);
 		analysis.setResult(res);
