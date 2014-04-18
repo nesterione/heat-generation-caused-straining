@@ -41,18 +41,30 @@ public class Tet4n implements Element {
 
 @Override
 public double getVolume() {
+		
+	double x1 = nodes[0].getPosition(Axis.X);
+	double x2 = nodes[1].getPosition(Axis.X);
+	double x3 = nodes[2].getPosition(Axis.X);
+	double x4 = nodes[3].getPosition(Axis.X);
 	
-	double[][] md = new double[4][4];
+	double y1 = nodes[0].getPosition(Axis.Y);
+	double y2 = nodes[1].getPosition(Axis.Y);
+	double y3 = nodes[2].getPosition(Axis.Y);
+	double y4 = nodes[3].getPosition(Axis.Y);
 	
-	for(int i = 0; i < NODE_COUNT; i++) {
-		md[i][0] = 1;
-		md[i][1] = nodes[i].getPosition(Axis.X);
-		md[i][2] = nodes[i].getPosition(Axis.Y);
-		md[i][3] = nodes[i].getPosition(Axis.Z);
-	}
+	double z1 = nodes[0].getPosition(Axis.Z);
+	double z2 = nodes[1].getPosition(Axis.Z);
+	double z3 = nodes[2].getPosition(Axis.Z);
+	double z4 = nodes[3].getPosition(Axis.Z);
 	
-	double Ve = Math.abs(DET(md)) / 6.0;
+	double[][] md = {
+			{x2-x1, y2-y1, z2-z1},
+			{x3-x1, y3-y1, z3-z1},
+			{x4-x1, y4-y1, z4-z1}
+	};
 	
+	double det = DET(md);
+	double Ve = Math.abs(det) / 6.0;
 	return Ve;
   }
 

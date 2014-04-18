@@ -363,8 +363,24 @@ public class MMath
     /// <returns></returns>
     static public double DET(double[][] A)
     {
+    	if(A.length==1) 
+    		return A[0][0];
+    	
+    	if(A.length==2) {
+    		return A[0][0]*A[1][1] - A[0][1]*A[1][0];
+    	}
+    	
+    	if(A.length==3) {
+    		double det = A[0][0]*A[1][1]*A[2][2] -
+    				     A[0][0]*A[1][2]*A[2][1] -
+    				     A[0][1]*A[1][0]*A[2][2] +
+    				     A[0][1]*A[1][2]*A[2][0] +
+    				     A[0][2]*A[1][0]*A[2][1] -
+    				     A[0][2]*A[1][1]*A[2][0];
+    		return det;
+    	}
 
-
+    	//иначе считать через треугольную матрицу
         int ln = A.length;
 
         for (int i = 0; i < ln; i++) //выполнение прямого хода Метода Гауса
