@@ -35,8 +35,8 @@ public class StaticStructuralSolver {
 	
 	private StaticStructuralAlalysis analysis;
 
-	public StaticStructuralSolver(StaticStructuralAlalysis analysis) {
-		this.analysis = analysis;
+	public StaticStructuralSolver(StaticStructuralAlalysis staticStructuralAnalysis) {
+		this.analysis = staticStructuralAnalysis;
 	}
 
 	/**

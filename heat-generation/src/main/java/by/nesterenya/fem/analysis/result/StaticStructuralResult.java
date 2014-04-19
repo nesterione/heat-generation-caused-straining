@@ -78,6 +78,10 @@ public class StaticStructuralResult implements Result {
 		return deformations.get(node);
 	}
 	
+	public Map<Node, Deformation> getDeformations() {
+		return deformations;
+	}
+	
 	public void setDeformations(Map<Node, Deformation> deformations) {
 		this.deformations = deformations;
 	}
@@ -132,6 +136,10 @@ public class StaticStructuralResult implements Result {
 	
 	public Strain getStrain(Element element) {
 		return strains.get(element);
+	}
+	
+	public Map<Element, Strain> getStrains() {
+		return strains;
 	}
 	
 	public double getTotalStrain(Element element) {
@@ -251,6 +259,10 @@ public double getMinNodalStrain() {
 	public StrainEnergy getStrainEnergy(Element element) {
 		return strainEnergies.get(element);
 	}
+	
+	public Map<Element, StrainEnergy> getStrainEnergies() {
+		return strainEnergies;
+	}
 
 	public void setStrainEnergies(Map<Element, StrainEnergy> strainEnergies) {
 		this.strainEnergies = strainEnergies;
@@ -306,6 +318,10 @@ public double getMinNodalStrain() {
 	
 	public Temperature getTemperature(Node node) {
 		return temperatures.get(node);
+	}
+	
+	public Map<Node, Temperature> getTemperatures() {
+		return temperatures;
 	}
 
 	public void setTemperatures(Map<Node, Temperature> temperatures) {

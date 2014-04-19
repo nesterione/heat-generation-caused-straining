@@ -12,7 +12,10 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
+import by.nesterenya.fem.analysis.Analysis;
+import by.nesterenya.fem.analysis.DynamicStructuralAnalysis;
 import by.nesterenya.fem.analysis.StaticStructuralAlalysis;
+import by.nesterenya.fem.analysis.result.DynamicStructuralResult;
 
 //TODO refact this
 public class GlDisplay extends GLCanvas implements GLEventListener {
@@ -23,7 +26,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	    NOTHING, MODEL, MESH, DEFORMATION, STRAIN, NODAL_STRAIN, STRAIN_ENERGY, STRAIN_TEMPERATURE
 	};
 	
-	private StaticStructuralAlalysis analysis_d;
+	private Analysis analysis_d;
 	
 	private GLU glu;
 
@@ -36,9 +39,9 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	}*/
 	
 	public void setDisplayType(DisplayType displayType) {
-		
 		//TODO ему тут не место
-		painter.setDrawDelegate(SceneFactory.getDelegete(displayType, analysis_d), position);
+		painter.setDrawDelegate(SceneFactory.getDelegete(displayType, (StaticStructuralAlalysis)analysis_d), position);
+		
 	}
 	
 	public Position getPosition() {
@@ -66,6 +69,10 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	public void display(GLAutoDrawable drawable) {
 		
 		painter.Draw(drawable);
+
+		if(analysis_d instanceof DynamicStructuralAnalysis) {
+			((DynamicStructuralResult)analysis_d.getResult()).nextTime();
+		}
 	}
 
 	@Override
@@ -116,7 +123,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	    gl.glLoadIdentity();
 	}
 
-	public void setAnalysisD(StaticStructuralAlalysis analysis) {
+	public void setAnalysisD(Analysis analysis) {
 		this.analysis_d = analysis;
 	}
 	

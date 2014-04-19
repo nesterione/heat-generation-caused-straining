@@ -20,7 +20,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.plaf.DimensionUIResource;
 
+import org.omg.CORBA.DynamicImplementation;
+
 import by.nesterenya.fem.GlDisplay.DisplayType;
+import by.nesterenya.fem.analysis.Analysis;
+import by.nesterenya.fem.analysis.DynamicStructuralAnalysis;
 import by.nesterenya.fem.analysis.StaticStructuralAlalysis;
 import by.nesterenya.fem.boundary.Load;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
@@ -43,7 +47,7 @@ public class STModeling implements ActionListener {
 	/**
 	 * Timer for refresh image in <code> glDisplay </code>
 	 */
-	final FPSAnimator animator = new FPSAnimator(glDisplay, 20, true);
+	final FPSAnimator animator = new FPSAnimator(glDisplay, 14, true);
 
 	/**
 	 * Object current window
@@ -64,7 +68,8 @@ public class STModeling implements ActionListener {
 	}
 
 	JFrame frame;
-
+	Analysis analysis= null;
+	
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Static thermal modeling");
@@ -178,11 +183,11 @@ public class STModeling implements ActionListener {
 					e.printStackTrace();
 				}
 				
-				StaticStructuralAlalysis analysis = new StaticStructuralAlalysis();
-				analysis.setGeometry(box);
-				analysis.setMesh(mesh);
+				analysis = new StaticStructuralAlalysis();
+				((StaticStructuralAlalysis)analysis).setGeometry(box);
+				((StaticStructuralAlalysis)analysis).setMesh(mesh);
 				
-				glDisplay.setAnalysisD(analysis);
+				glDisplay.setAnalysisD((StaticStructuralAlalysis)analysis);
 				glDisplay.setDisplayType(DisplayType.MESH);
 				glDisplay.display();
 			}
@@ -215,10 +220,10 @@ public class STModeling implements ActionListener {
 				e.printStackTrace();
 			}
 				
-			StaticStructuralAlalysis analysis = new StaticStructuralAlalysis();
+			analysis = new StaticStructuralAlalysis();
 			
-			analysis.setGeometry(box);
-			analysis.setMesh(mesh);
+			((StaticStructuralAlalysis)analysis).setGeometry(box);
+			((StaticStructuralAlalysis)analysis).setMesh(mesh);
 				
 			List<Load> loads = new ArrayList<>();
 			//TODO: задавать направление действия силы
@@ -241,7 +246,75 @@ public class STModeling implements ActionListener {
 			
 			analysis.getMesh().getMaterial().put(0,material );
 			
-			analysis.setLoads(loads);
+			((StaticStructuralAlalysis)analysis).setLoads(loads);
+			
+			try {
+				analysis.solve();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+				
+			// TODO задавать силу F = A*sin(w*t)
+			glDisplay.setAnalysisD((StaticStructuralAlalysis)analysis);
+			glDisplay.setDisplayType(DisplayType.STRAIN_TEMPERATURE);
+			glDisplay.display();
+			}
+		});
+		leftPanel.add(btn_solveDef);
+		
+		JButton btn_solveDyn = new JButton();
+		btn_solveDyn.setText("Dyn");
+		btn_solveDyn.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+			//TODO now I use for calculation fixed values which was hardcoded
+			//TODO make a entering values with GUI
+				
+			double box_ox = Double.parseDouble(tb_plateLenght.getText());
+			double box_oy = Double.parseDouble(tb_plateWidth.getText());
+			double box_oz = Double.parseDouble(tb_plateHeight.getText());
+				
+			Box box = new Box(box_ox, box_oy, box_oz);
+				
+			int nodeCountOX =  Integer.parseInt(tb_nodeCountOX.getText());
+			int nodeCountOY =  Integer.parseInt(tb_nodeCountOY.getText());
+			int nodeCountOZ =  Integer.parseInt(tb_nodeCountOZ.getText());
+				
+			Mesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
+				
+			Mesh mesh = null;
+			try {
+				 mesh = mesher.formMesh();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+				
+			analysis = new DynamicStructuralAnalysis();
+			
+			((DynamicStructuralAnalysis)analysis).setGeometry(box);
+			((DynamicStructuralAnalysis)analysis).setMesh(mesh);
+				
+			List<Load> loads = new ArrayList<>();
+			//TODO: задавать направление действия силы
+			loads.add( new StaticEvenlyDistributedLoad(1100000000, analysis.getMesh().getBoundaries().get("верхняя")));    
+			
+			loads.add( new Support(analysis.getMesh().getBoundaries().get("левая")) );
+			loads.add( new Support(analysis.getMesh().getBoundaries().get("правая")) );
+			//loads.add( new Support(analysis.getMesh().getBoundaries().get("передняя")) );
+			//loads.add( new Support(analysis.getMesh().getBoundaries().get("задняя")) );
+			
+			Material material = new Material();
+			material.setDensity(7850);
+			material.setSpecificHeatCapacity(462);
+			material.setName("sdf");
+			//material.setThermalConductivity(60.5);
+			//material.setSpecificHeatCapacity(434);
+			material.setPoissonsRatio(0.3);
+			material.setElasticModulus(200000000000.0); 
+			                       
+			
+			analysis.getMesh().getMaterial().put(0,material );
+			
+			((DynamicStructuralAnalysis)analysis).setLoads(loads);
 			
 			try {
 				analysis.solve();
@@ -255,7 +328,7 @@ public class STModeling implements ActionListener {
 			glDisplay.display();
 			}
 		});
-		leftPanel.add(btn_solveDef);
+		leftPanel.add(btn_solveDyn);
 		
 		splitPane.setLeftComponent(leftPanel);
 
