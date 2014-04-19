@@ -1,4 +1,4 @@
-package by.nesterenya.fem.static_thermal;
+package by.nesterenya.fem;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;

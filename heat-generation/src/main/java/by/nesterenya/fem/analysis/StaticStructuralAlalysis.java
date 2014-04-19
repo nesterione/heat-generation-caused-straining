@@ -6,9 +6,9 @@ import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.boundary.Load;
 import by.nesterenya.fem.mesh.Mesh;
 import by.nesterenya.fem.primitives.Box;
-import by.nesterenya.fem.solver.StaticDeformationSolver;
+import by.nesterenya.fem.solver.StaticStructuralSolver;
 
-public class StaticDeformationAlalysis extends Analysis {
+public class StaticStructuralAlalysis extends Analysis {
 
 	public Box getGeometry() {
 		return geometry;
@@ -44,7 +44,7 @@ public class StaticDeformationAlalysis extends Analysis {
 
 	@Override
 	public void solve() throws Exception {
-		StaticDeformationSolver solver = new StaticDeformationSolver(this);
+		StaticStructuralSolver solver = new StaticStructuralSolver(this);
 		solver.Solve();
 	}
 

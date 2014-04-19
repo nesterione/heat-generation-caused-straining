@@ -1,4 +1,4 @@
-package by.nesterenya.fem.static_thermal;
+package by.nesterenya.fem;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -9,17 +9,17 @@ import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2GL3;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
 
-import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
+import by.nesterenya.fem.GlDisplay.DisplayType;
+import by.nesterenya.fem.analysis.StaticStructuralAlalysis;
 import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.primitives.Box;
-import by.nesterenya.fem.static_thermal.GlDisplay.DisplayType;
 
 public class SceneFactory {
 	
-	public static DrawDelegate getDelegete(DisplayType displayType, StaticDeformationAlalysis analysis) {
+	public static DrawDelegate getDelegete(DisplayType displayType, StaticStructuralAlalysis analysis) {
 	
 		DrawDelegate delegate = null;
 		
@@ -64,7 +64,7 @@ public class SceneFactory {
 		gl.glVertex3d(x,y,z);
 	}
 	
-	private static void drawGLVertex3d_deformation(GL2 gl, Node node, StaticDeformationAlalysis analysis) throws Exception {
+	private static void drawGLVertex3d_deformation(GL2 gl, Node node, StaticStructuralAlalysis analysis) throws Exception {
 			
 		double x = node.getPosition(Axis.X);
 		double y = node.getPosition(Axis.Y);
@@ -123,9 +123,9 @@ public class SceneFactory {
 	
 	private static class Model implements DrawDelegate {
 
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public Model(StaticDeformationAlalysis analysis) {
+		public Model(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		
@@ -164,9 +164,9 @@ public class SceneFactory {
 	
 	private static class Mesh implements DrawDelegate {
 
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public Mesh(StaticDeformationAlalysis analysis) {
+		public Mesh(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		
@@ -218,9 +218,9 @@ public class SceneFactory {
 	
 	private static class Deformation implements DrawDelegate {
 
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public Deformation(StaticDeformationAlalysis analysis) {
+		public Deformation(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		
@@ -258,9 +258,9 @@ public class SceneFactory {
 	
 	private static class Strain implements DrawDelegate {
 		
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public Strain(StaticDeformationAlalysis analysis) {
+		public Strain(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		
@@ -292,9 +292,9 @@ public class SceneFactory {
 	
 	private static class NodalStrain implements DrawDelegate {
 		
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public NodalStrain(StaticDeformationAlalysis analysis) {
+		public NodalStrain(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 
@@ -330,9 +330,9 @@ public class SceneFactory {
 	
 	private static class StrainEnergy implements DrawDelegate {
 
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public StrainEnergy(StaticDeformationAlalysis analysis) {
+		public StrainEnergy(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		
@@ -364,9 +364,9 @@ public class SceneFactory {
 	
 	private static class StrainTemperature implements DrawDelegate {
 		
-		private StaticDeformationAlalysis analysis;
+		private StaticStructuralAlalysis analysis;
 		
-		public StrainTemperature(StaticDeformationAlalysis analysis) {
+		public StrainTemperature(StaticStructuralAlalysis analysis) {
 			this.analysis = analysis;
 		}
 		

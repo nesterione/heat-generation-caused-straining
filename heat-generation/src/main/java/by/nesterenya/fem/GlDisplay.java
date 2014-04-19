@@ -1,4 +1,4 @@
-package by.nesterenya.fem.static_thermal;
+package by.nesterenya.fem;
 
 import static javax.media.opengl.GL.*;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
@@ -12,7 +12,7 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
-import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
+import by.nesterenya.fem.analysis.StaticStructuralAlalysis;
 
 //TODO refact this
 public class GlDisplay extends GLCanvas implements GLEventListener {
@@ -23,7 +23,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	    NOTHING, MODEL, MESH, DEFORMATION, STRAIN, NODAL_STRAIN, STRAIN_ENERGY, STRAIN_TEMPERATURE
 	};
 	
-	private StaticDeformationAlalysis analysis_d;
+	private StaticStructuralAlalysis analysis_d;
 	
 	private GLU glu;
 
@@ -116,7 +116,7 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	    gl.glLoadIdentity();
 	}
 
-	public void setAnalysisD(StaticDeformationAlalysis analysis) {
+	public void setAnalysisD(StaticStructuralAlalysis analysis) {
 		this.analysis_d = analysis;
 	}
 	

@@ -1,4 +1,4 @@
-package by.nesterenya.fem.static_thermal;
+package by.nesterenya.fem;
 
 public class Position {
 	private double zoom;

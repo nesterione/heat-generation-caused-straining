@@ -1,4 +1,4 @@
-package by.nesterenya.fem.static_thermal;
+package by.nesterenya.fem;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -20,7 +20,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.plaf.DimensionUIResource;
 
-import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
+import by.nesterenya.fem.GlDisplay.DisplayType;
+import by.nesterenya.fem.analysis.StaticStructuralAlalysis;
 import by.nesterenya.fem.boundary.Load;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
@@ -29,10 +30,9 @@ import by.nesterenya.fem.mesh.BoxMesher;
 import by.nesterenya.fem.mesh.Mesh;
 import by.nesterenya.fem.mesh.Mesher;
 import by.nesterenya.fem.primitives.Box;
-import by.nesterenya.fem.static_thermal.GlDisplay.DisplayType;
 
 import com.jogamp.opengl.util.FPSAnimator;
-//TODO переместить в другой пакет
+
 public class STModeling implements ActionListener {
 
 	/**
@@ -178,7 +178,7 @@ public class STModeling implements ActionListener {
 					e.printStackTrace();
 				}
 				
-				StaticDeformationAlalysis analysis = new StaticDeformationAlalysis();
+				StaticStructuralAlalysis analysis = new StaticStructuralAlalysis();
 				analysis.setGeometry(box);
 				analysis.setMesh(mesh);
 				
@@ -215,7 +215,7 @@ public class STModeling implements ActionListener {
 				e.printStackTrace();
 			}
 				
-			StaticDeformationAlalysis analysis = new StaticDeformationAlalysis();
+			StaticStructuralAlalysis analysis = new StaticStructuralAlalysis();
 			
 			analysis.setGeometry(box);
 			analysis.setMesh(mesh);
