@@ -119,7 +119,8 @@ public class StaticResultEvaluator {
 			double[][] locK = StaticStructuralSolver.formLocalK(element);
 			
 			double[] dd = MUL(res, locK);		
-			double energy = MUL(dd,res)*0.5;
+			double energy = MUL(dd,res);
+			// mult on 0.5
 			
 			strainEnergies.put(element, new StrainEnergy(energy));
 		}
@@ -150,7 +151,7 @@ public class StaticResultEvaluator {
 				
 				if(temperatures.containsKey(node)) {
 					Temperature t = temperatures.get(node);
-					double newVal = (t.getValue()+ dT)/2;
+					double newVal = Math.max(t.getValue(), dT);
 					t.setValue(newVal);
 				} else {
 					temperatures.put(node, new Temperature(dT));
@@ -160,4 +161,6 @@ public class StaticResultEvaluator {
 		
 		return temperatures;
 	}
+	
+	
 }

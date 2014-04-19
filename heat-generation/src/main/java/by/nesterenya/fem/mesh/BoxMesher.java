@@ -144,57 +144,62 @@ public class BoxMesher implements Mesher {
 		// s: cntSloi * (iz+1) + iy * nCntOX + (ix+1)
 		// m: cntSloi * (iz+1) + (iy+1) * nCntOX + (ix+1)
 		// k: cntSloi * (iz+1) + (iy+1) * nCntOX + ix
-
+        
+		boolean isEven = true;
+		boolean isEvenZ = true;
+		boolean isEvenY = true;
+		
 		counter = 0;
-		for (int iz = 0; iz < nCntOZ - 1; iz++)
+		
+		for (int iz = 0; iz < nCntOZ - 1; iz++) {
 			for (int iy = 0; iy < nCntOY - 1; iy++) {
 				for (int ix = 0; ix < nCntOX - 1; ix++) {
-					int i = nodesOnLayerCount * iz + iy * nCntOX + ix;
-					int r = nodesOnLayerCount * iz + iy * nCntOX + (ix + 1);
-					int p = nodesOnLayerCount * iz + (iy + 1) * nCntOX
-							+ (ix + 1);
-					int n = nodesOnLayerCount * iz + (iy + 1) * nCntOX + ix;
-					int j = nodesOnLayerCount * (iz + 1) + iy * nCntOX + ix;
-					int s = nodesOnLayerCount * (iz + 1) + iy * nCntOX
-							+ (ix + 1);
-					int m = nodesOnLayerCount * (iz + 1) + (iy + 1) * nCntOX
-							+ (ix + 1);
-					int k = nodesOnLayerCount * (iz + 1) + (iy + 1) * nCntOX
-							+ ix;
 
-					//TODO Убрать длинные строки
-
-					// knip
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(n),
-							nodes.get(k), nodes.get(m), nodes.get(j) },
-							materials, 0));
-
-					// ijkm
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(m),
-							nodes.get(p), nodes.get(n), nodes.get(i) },
-							materials, 0));
-
-					// kmpj
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(n),
-							nodes.get(i), nodes.get(j), nodes.get(m) },
-							materials, 0));
-
-					// rsim
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(s),
-							nodes.get(r), nodes.get(p), nodes.get(i) },
-							materials, 0));
-
-					// mpir
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(i),
-							nodes.get(j), nodes.get(m), nodes.get(s) },
-							materials, 0));
-
-					// rjim
-					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(i),
-							nodes.get(p), nodes.get(s), nodes.get(m) },
-							materials, 0));
+					int j = nodesOnLayerCount * iz + (iy    ) * nCntOX + (ix    );
+					int i = nodesOnLayerCount * iz + (iy    ) * nCntOX + (ix + 1);
+					int k = nodesOnLayerCount * iz + (iy + 1) * nCntOX + (ix    );
+					int p = nodesOnLayerCount * iz + (iy + 1) * nCntOX + (ix + 1);
+					
+					int m = nodesOnLayerCount * (iz + 1) + (iy    ) * nCntOX + (ix    );
+					int n = nodesOnLayerCount * (iz + 1) + (iy    ) * nCntOX + (ix + 1);
+					int r = nodesOnLayerCount * (iz + 1) + (iy + 1) * nCntOX + (ix    );
+					int s = nodesOnLayerCount * (iz + 1) + (iy + 1) * nCntOX + (ix + 1);
+				
+					if(isEven) {
+						Node[] mkij =  new Node[] { nodes.get(m),nodes.get(k), nodes.get(i), nodes.get(j) };
+						Node[] kmsr =  new Node[] { nodes.get(k),nodes.get(m), nodes.get(s), nodes.get(r) };
+						Node[] sikp =  new Node[] { nodes.get(s),nodes.get(i), nodes.get(k), nodes.get(p) };
+						Node[] ismn =  new Node[] { nodes.get(i),nodes.get(s), nodes.get(m), nodes.get(n) };
+						Node[] smki =  new Node[] { nodes.get(s),nodes.get(m), nodes.get(k), nodes.get(i) };
+					
+						elements.add(new Tet4n(counter++,0, mkij, materials, 0));
+						elements.add(new Tet4n(counter++,0, kmsr, materials, 0));
+						elements.add(new Tet4n(counter++,0, sikp, materials, 0));
+						elements.add(new Tet4n(counter++,0, ismn, materials, 0));
+						elements.add(new Tet4n(counter++,0, smki, materials, 0));
+					} else {
+						Node[] rpjk =  new Node[] { nodes.get(r),nodes.get(p), nodes.get(j), nodes.get(k) };
+						Node[] prns =  new Node[] { nodes.get(p),nodes.get(r), nodes.get(n), nodes.get(s) };
+						Node[] njpi =  new Node[] { nodes.get(n),nodes.get(j), nodes.get(p), nodes.get(i) };
+						Node[] jnrm =  new Node[] { nodes.get(j),nodes.get(n), nodes.get(r), nodes.get(m) };
+						Node[] nrpj =  new Node[] { nodes.get(n),nodes.get(r), nodes.get(p), nodes.get(j) };
+					
+						elements.add(new Tet4n(counter++,0, rpjk, materials, 0));
+						elements.add(new Tet4n(counter++,0, prns, materials, 0));
+						elements.add(new Tet4n(counter++,0, njpi, materials, 0));
+						elements.add(new Tet4n(counter++,0, jnrm, materials, 0));
+						elements.add(new Tet4n(counter++,0, nrpj, materials, 0));
+					}
+					
+					isEven = !isEven;
 				}
+				isEvenY = !isEvenY;
+				isEven = isEvenY;
 			}
+			isEvenZ=!isEvenZ;
+			isEvenY = isEvenZ;
+			isEven = isEvenZ;
+		}
 
 		// Creating BoxMesh
 		MeshBox mesh = new MeshBox(nodes, elements, materials, boundaries);

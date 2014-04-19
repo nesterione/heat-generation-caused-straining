@@ -226,6 +226,8 @@ public class STModeling implements ActionListener {
 			
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("левая")) );
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("правая")) );
+			//loads.add( new Support(analysis.getMesh().getBoundaries().get("передняя")) );
+			//loads.add( new Support(analysis.getMesh().getBoundaries().get("задняя")) );
 			
 			Material material = new Material();
 			material.setDensity(7850);
