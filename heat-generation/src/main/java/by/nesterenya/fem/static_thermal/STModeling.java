@@ -23,7 +23,6 @@ import javax.swing.plaf.DimensionUIResource;
 import by.nesterenya.fem.analysis.init.*;
 import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
-import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
 import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.StaticTemperature;
@@ -177,84 +176,24 @@ public class STModeling implements ActionListener {
 				IMesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
 				
 				IMesh mesh = null;
+				
 				try {
 					 mesh = mesher.formMesh();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
-				glDisplay.setModel(box);
+				StaticDeformationAlalysis analysis = new StaticDeformationAlalysis();
+				analysis.setGeometry(box);
+				analysis.setMesh(mesh);
 				
-				if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
-				
+				glDisplay.setAnalysisD(analysis);
+				glDisplay.setDisplayType(DisplayType.MESH);
 				glDisplay.display();
 			}
 		});
 		leftPanel.add(btn_disp);
 
-		
-		JButton btn_solve = new JButton();
-		btn_solve.setText("Solve");
-		btn_solve.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//TODO now I use for calculation fixed values which was hardcoded
-				//TODO make a entering values with GUI
-				
-
-				double box_ox = Double.parseDouble(tb_plateLenght.getText());
-				double box_oy = Double.parseDouble(tb_plateWidth.getText());
-				double box_oz = Double.parseDouble(tb_plateHeight.getText());
-				Box box = new Box(box_ox, box_oy, box_oz);
-				
-				//TODO объеденить параметры сетки в одни класс
-				int nodeCountOX =  Integer.parseInt(tb_nodeCountOX.getText());
-				int nodeCountOY =  Integer.parseInt(tb_nodeCountOY.getText());
-				int nodeCountOZ =  Integer.parseInt(tb_nodeCountOZ.getText());
-				
-				IMesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
-				
-				IMesh mesh = null;
-				try {
-					 mesh = mesher.formMesh();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				
-				ThermalStaticAnalisis analysis = new ThermalStaticAnalisis();
-				analysis.setGeometry(box);
-				analysis.setMesh(mesh);
-				analysis.setDataInit(new InitDataStaticThermal(300));
-				
-				List<ILoad> loads = new ArrayList<>();
-				loads.add(new StaticTemperature(400, analysis.getMesh().getBoundaries().get("левая")));
-				loads.add(new StaticTemperature(300, analysis.getMesh().getBoundaries().get("правая")));
-				
-				Material material = new Material();
-				material.setDensity(7850);
-				material.setName("sdf");
-				material.setThermalConductivity(60.5);
-				material.setSpecificHeatCapacity(434);
-				
-				analysis.getMesh().getMaterial().put(0,material );
-				
-				analysis.setLoads(loads);
-				
-				analysis.solve();
-				
-				//glDisplay.setModel(box);
-				glDisplay.setAnalysis(analysis);
-				glDisplay.setDisplayType(DisplayType.RESULT);
-				//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
-				
-				glDisplay.display();
-			}
-		});
-		leftPanel.add(btn_solve);
-		
-		
 		JButton btn_solveDef = new JButton();
 		btn_solveDef.setText("Deform");
 		btn_solveDef.addActionListener(new ActionListener() {
@@ -327,11 +266,8 @@ public class STModeling implements ActionListener {
 			
 			//glDisplay.setModel(box);
 			glDisplay.setAnalysisD(analysis);
-			glDisplay.setDisplayType(DisplayType.TEMPERATURE);
-			//glDisplay.setDisplayType(DisplayType.STRAIN);
-			//if(mesh != null) { glDisplay.setMesh(mesh); glDisplay.setDisplayType(DisplayType.MESH);}
-				
-				glDisplay.display();
+			glDisplay.setDisplayType(DisplayType.STRAIN_TEMPERATURE);
+			glDisplay.display();
 			}
 		});
 		leftPanel.add(btn_solveDef);

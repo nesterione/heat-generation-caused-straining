@@ -192,11 +192,11 @@ public double getMinNodalStrain() {
 		return maxNodalStrain;
 	}
 	
-	public double getNodadStrain(Node node) {
+	public double getNodalStrain(Node node) {
 		return nodalStrains.get(node).getValue();
 	}
 
-	public void setDeformationInNode(Map<Node, NodalStrain> nodalStrains) {
+	public void setNodalStrain(Map<Node, NodalStrain> nodalStrains) {
 		this.nodalStrains = nodalStrains;
 	}
 	

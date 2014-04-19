@@ -5,9 +5,7 @@ import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SMOOTH;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2GL3;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.awt.GLCanvas;
@@ -15,8 +13,6 @@ import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
-import by.nesterenya.fem.analysis.ThermalStaticAnalisis;
-import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
   
@@ -25,25 +21,25 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	//TODO сделать битовый вектор вместо этого перечисления
 	
 	public enum DisplayType {
-	    MODEL, MESH, RESULT, MESHRESULT, DEFORMATION, STRAIN, NODAL_STRAIN, STRAIN_ENERGY, TEMPERATURE
-	  };
+	    NOTHING, MODEL, MESH, DEFORMATION, STRAIN, NODAL_STRAIN, STRAIN_ENERGY, STRAIN_TEMPERATURE
+	};
 	
-	private Box model;
-	private IMesh mesh;
-	private ThermalStaticAnalisis analysis;
 	private StaticDeformationAlalysis analysis_d;
 	
 	private GLU glu;
-	private GL2 gl;
-	private DisplayType displayType = DisplayType.MODEL;
+
+	//private DisplayType displayType = DisplayType.NOTHING;
 	private Position position = new Position();
+	private ScenePainter painter = new ScenePainter();
 	
-	public DisplayType getDisplayType() {
+	/*public DisplayType getDisplayType() {
 		return displayType;
-	}
+	}*/
 	
 	public void setDisplayType(DisplayType displayType) {
-		this.displayType = displayType;
+		
+		//TODO ему тут не место
+		painter.setDrawDelegate(SceneFactory.getDelegete(displayType, analysis_d), position);
 	}
 	
 	public Position getPosition() {
@@ -56,6 +52,8 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 		 //Set start position of scene 
 		 position.setAngle_x(-20);
 		 position.setAngle_y(20);
+		 
+		 painter.setDrawDelegate(SceneFactory.getDelegete(DisplayType.NOTHING, null), position);
 	}
 	  
 	/**
@@ -63,77 +61,12 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		//if (analysis == null) return;
-	    if (displayType == null) return;
-	    gl = drawable.getGL().getGL2();
-
-	    // clear
-	    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
-	    // Сброс параметов модели отображения
-	    gl.glLoadIdentity();
-	    gl.glTranslatef(0.0f, 0.0f, -30.0f);
-
-	    // фон
-	    gl.glBegin(GL2GL3.GL_QUADS);
-	    // white color
-	    gl.glColor3f(0.42f, 0.55f, 0.83f);
-	    gl.glVertex2f(30.0f, 20.0f);
-	    gl.glVertex2f(-30.0f, 20.0f);
-	    // blue color
-	    gl.glColor3f(1.0f, 1.0f, 1.0f);
-	    gl.glVertex2f(-30.0f, -20.0f);
-	    gl.glVertex2f(30.0f, -20.0f);
-	    gl.glEnd();
-
-	    
-	    // Сместить в нуть на 30
-	    gl.glTranslatef(0.0f, 0.0f, 30.0f);
-
-	    try {
-	      switch (displayType) {
-	        case MODEL:
-	           if(model!=null) {  GLPainterHelper.plotModel(gl, position, model); }
-	          break;
-	        case MESH:
-	        	if(mesh!=null) {  GLPainterHelper.plotMesh(gl, position, mesh); }
-	          break;
-	        case RESULT:
-	        	if(analysis!=null) {  GLPainterHelper.plotThermalResult(gl, position, analysis); }
-	          break;
-	        case MESHRESULT:
-	          //plotMehResult();
-	          break;
-	        case DEFORMATION:
-	        	if(analysis_d!=null) {  GLPainterHelper.plotDeformationResult(gl, position, analysis_d); }
-	        	break;
-	        case STRAIN:
-	        	if(analysis_d!=null) {
-	        		GLPainterHelper.plotStrainResult(gl, position, analysis_d);
-	        	}
-	        	break;
-	        case NODAL_STRAIN:
-	        	if(analysis_d!=null) {
-	        		GLPainterHelper.plotStrainInNodesResult(gl, position, analysis_d);
-	        	}
-	        	break;
-	        case STRAIN_ENERGY:
-	        	if(analysis_d!=null) {
-	        		GLPainterHelper.plotStrainEnergyResult(gl, position, analysis_d);
-	        	}
-	        	break;
-	        case TEMPERATURE:
-	        	if(analysis_d!=null) {
-	        		GLPainterHelper.plotStructalTemperatureResult(gl, position, analysis_d);
-	        	}
-	        	break;
-	      }
-	    } catch (Exception e) {
-	      e.printStackTrace();
-	    }
 		
+		painter.Draw(drawable);
 	}
 
 	@Override
@@ -184,31 +117,8 @@ public class GlDisplay extends GLCanvas implements GLEventListener {
 	    gl.glLoadIdentity();
 	}
 
-	public Box getModel() {
-		return model;
-	}
-
-	public void setModel(Box model) {
-		this.model = model;
-	}
-
-	public IMesh getMesh() {
-		return mesh;
-	}
-
-	public void setMesh(IMesh mesh) {
-		this.mesh = mesh;
-	}
-
-	public ThermalStaticAnalisis getAnalysis() {
-		return analysis;
-	}
-
 	public void setAnalysisD(StaticDeformationAlalysis analysis) {
 		this.analysis_d = analysis;
 	}
 	
-	public void setAnalysis(ThermalStaticAnalisis analysis) {
-		this.analysis = analysis;
-	}
 }

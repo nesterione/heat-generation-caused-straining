@@ -419,7 +419,7 @@ public class StaticDeformationSolver {
 		Map<Node, Temperature> temperatures = evaluateStrainTempereature(strainEnergies);
 		
 		StaticStructuralResult res = new StaticStructuralResult(deformations, strains, strainEnergies,temperatures);
-		res.setDeformationInNode(nodalStrains);
+		res.setNodalStrain(nodalStrains);
 		
 		analysis.setResult(res);
 	}

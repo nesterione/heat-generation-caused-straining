@@ -7,7 +7,6 @@ import by.nesterenya.fem.boundary.ILoad;
 import by.nesterenya.fem.mesh.IMesh;
 import by.nesterenya.fem.primitives.Box;
 import by.nesterenya.fem.solver.StaticDeformationSolver;
-import by.nesterenya.fem.solver.ThermalStaticSolver;
 
 public class StaticDeformationAlalysis extends Analysis {
 
