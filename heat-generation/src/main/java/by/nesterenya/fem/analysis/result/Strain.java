@@ -17,7 +17,7 @@ public class Strain {
 	private double y_xy;
 	private double y_xz;
 	private double y_yz;
-	//TODO проверить порядо параметров
+
 	public Strain(double ex, double ey, double ez, double y_xy,double y_yz, double y_xz) {
 		setEx(ex);
 		setEy(ey);

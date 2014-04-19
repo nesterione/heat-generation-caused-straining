@@ -4,11 +4,8 @@ package by.nesterenya.fem.element.material;
  * Thermal property material
  * 
  */
-public class Material implements IMaterial {
+public class Material {
 
-	/**
-	 * Название материала
-	 */
 	private String name;
 
 	public double getDensity() {
@@ -54,13 +51,11 @@ public class Material implements IMaterial {
 	 */
 	private double specificHeatCapacity;
 
-	@Override
 	public String getName() {
 
 		return name;
 	}
 
-	// TODO: Как нибудь структурировать это все
 	/**
 	 * Модуль упругости, Юнга
 	 */

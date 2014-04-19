@@ -11,7 +11,7 @@ import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.result.Strain;
 import by.nesterenya.fem.analysis.result.StrainEnergy;
 import by.nesterenya.fem.analysis.result.Temperature;
-import by.nesterenya.fem.boundary.ILoad;
+import by.nesterenya.fem.boundary.Load;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
 import by.nesterenya.fem.boundary.Support;
 import by.nesterenya.fem.element.Element;
@@ -19,9 +19,8 @@ import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node.Axis;
 import by.nesterenya.fem.element.material.Material;
 import static by.nesterenya.fem.solver.MMath.*;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
 
+//TODO refact this
 public class StaticDeformationSolver {
 	
 	/**
@@ -221,14 +220,14 @@ public class StaticDeformationSolver {
 	public void setBoundaries(double[][] gK, double[] R) throws Exception {
 
 		// It's important to Fix Support past adding all loads
-		for (ILoad load : analysis.getLoads()) {
+		for (Load load : analysis.getLoads()) {
 			if (load instanceof StaticEvenlyDistributedLoad) {
 				addLoad((StaticEvenlyDistributedLoad) load, R);
 			}
 		}
 
 		// Fix support
-		for (ILoad load : analysis.getLoads()) {
+		for (Load load : analysis.getLoads()) {
 			if (load instanceof Support) {
 				fixNodes(gK, R, load.getBoundary().getNodes());
 			}

@@ -1,16 +1,16 @@
 package by.nesterenya.fem.solver;
 
-/// <summary>
-/// Статический класс для работы с матрицами
-/// </summary>
+/**
+ * 
+ * Статический класс для работы с матрицами
+ *
+ */
 public class MMath
 {
-    /// <summary>
-    /// Транспонирование матрицы
-    /// </summary>
-    /// <param name="matr"></param>
-    /// <returns></returns>
-    static public double[][] T(double[][] matr)//
+	/**
+	 * Транспонирование матрицы
+	 */
+    static public double[][] T(double[][] matr)
     {
         double[][] tMatr = new double[matr[0].length][matr.length];
         for (int i = 0; i < matr.length; i++)
@@ -19,12 +19,9 @@ public class MMath
         return tMatr;
     }
 
-    /// <summary>
-    /// Суммирование матриц
-    /// </summary>
-    /// <param name="matrA"></param>
-    /// <param name="matrB"></param>
-    /// <returns></returns>
+    /**
+     * Суммирование матриц
+     */
     static public double[][] SUM(double[][] matrA, double[][] matrB)
     {
         double[][] mulMatr = new double[matrA.length][ matrB[0].length];
@@ -34,12 +31,9 @@ public class MMath
         return mulMatr;
     }
 
-    /// <summary>
-    /// Умножение матрицы на матрицу
-    /// </summary>
-    /// <param name="matrA"></param>
-    /// <param name="matrB"></param>
-    /// <returns></returns>
+    /**
+     * Умножение матрицы на матрицу
+     */
     static public double[][] MUL(double[][] matrA, double[][] matrB)
     {
         double[][] mulMatr = new double[matrA.length][ matrB[0].length];
@@ -51,10 +45,9 @@ public class MMath
         return mulMatr;
     }
 
-    /// <summary>
-    /// Отразить верхнюю диогональную матрицу
-    /// </summary>
-    /// <param name="matrA"></param>
+    /**
+     * Отразить верхнюю диогональную матрицу
+     */
     static public void REF_UP(double[][] matrA)
     {
         for(int i = 0;i<matrA.length-1;i++)
@@ -64,12 +57,9 @@ public class MMath
             }
     }
 
-    /// <summary>
-    /// Умножение матрицы на вектор
-    /// </summary>
-    /// <param name="matrA"></param>
-    /// <param name="vectorB"></param>
-    /// <returns></returns>
+    /**
+     * Умножение матрицы на вектор
+     */
     static public double[] MUL(double[][] matrA, double[] vectorB)
     {
         double[] mulMatr = new double[matrA.length];
@@ -80,12 +70,9 @@ public class MMath
         return mulMatr;
     }
 
-    /// <summary>
-    /// Умножение матрицы на число
-    /// </summary>
-    /// <param name="matrA"></param>
-    /// <param name="Zn"></param>
-    /// <returns></returns>
+    /**
+     * Умножение матрицы на число
+     */
     static public double[][] MUL(double[][] matrA, double Zn)
     {
         double[][] mulMatr = new double[matrA.length][ matrA[0].length];
@@ -96,12 +83,9 @@ public class MMath
         return mulMatr;
     }
 
-    /// <summary>
-    /// Решение системы уравнения методом Гауса
-    /// </summary>
-    /// <param name="A"></param>
-    /// <param name="B"></param>
-    /// <returns></returns>
+    /**
+     *  Решение системы уравнения методом Гауса
+     */
     static public double[] gausSLAU(double[][] A, double[] B) throws Exception
     {
         double[] X = new double[A.length];
@@ -183,26 +167,14 @@ public class MMath
         return X;
     }
 
-    /// <summary>
-    /// Решение системы уравнения методом Гауса НЕ ИЗМЕНЯЕТ ВХОДЯЩИЕ МАТРИЦУ И ВЕКТОР
-    /// </summary>
-    /// <param name="A"></param>
-    /// <param name="B"></param>
-    /// <returns></returns>
+    /**
+     * Решение системы уравнения методом Гауса НЕ ИЗМЕНЯЕТ ВХОДЯЩИЕ МАТРИЦУ И ВЕКТОР
+     */
     static public double[] gausSLAU_NCH(double[][] inA, double[] inB) throws Exception
     {
         double[][] A; //= new double[inA.length][ inA[0].length];
         double[] B;//= new double[inB.length];
 
-       
-        
-        //Дублирование матриц
-//        for (int i = 0; i < A.length; i++)
-//        {
-//            for (int j = 0; j < A[0].length; j++)
-//                A[i][ j] = inA[i][ j];
-//            B[i] = inB[i];
-//        }        
         A = inA.clone();
         for (int i = 0; i < inA.length; i++) {
             A[i] = inA[i].clone();
@@ -288,11 +260,9 @@ public class MMath
         return X;
     }
 
-    /// <summary>
-    /// Получение обратной матрицы.
-    /// </summary>
-    /// <param name="A"></param>
-    /// <returns></returns>
+    /**
+     * Получение обратной матрицы.
+     */
     static public double[][] INV(double[][] A) throws Exception
     {
         double[][] B = new double[A.length][ A[0].length];
@@ -356,11 +326,9 @@ public class MMath
         return B;
     }
 
-    /// <summary>
-    /// Нахождение определителя матрицы.
-    /// </summary>
-    /// <param name="A"></param>
-    /// <returns></returns>
+    /**
+     * Нахождение определителя матрицы.
+     */
     static public double DET(double[][] A)
     {
     	if(A.length==1) 
@@ -433,6 +401,9 @@ public class MMath
         return X;
     }
 
+    /**
+     * Умножить вектор на константу
+     */
     public static double[] MUL(double[] vector, double cnst) {
       double[] result = new double[vector.length];
       for(int i =0;i<vector.length;i++) {
@@ -441,6 +412,9 @@ public class MMath
       return result;
     }
     
+    /**
+     * умножить вектор строку на вектор столбец
+     */
     public static double MUL(double[] vectorA, double[] vectorB) {
     	double result = 0;
     	
@@ -451,6 +425,9 @@ public class MMath
     	return result; 
     }
 
+    /**
+     * Умножить вектор на матрицу
+     */
 	public static double[] MUL(double[] res, double[][] A) {
 
 		double[] result = new double[res.length];

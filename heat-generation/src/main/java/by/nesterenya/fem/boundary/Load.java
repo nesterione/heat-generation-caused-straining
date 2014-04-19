@@ -1,5 +1,5 @@
 package by.nesterenya.fem.boundary;
 
-public interface ILoad {
+public interface Load {
   public Boundary getBoundary();
 }

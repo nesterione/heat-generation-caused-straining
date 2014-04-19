@@ -10,8 +10,7 @@ import by.nesterenya.fem.element.material.*;
  */
 public interface Element {
 	
-	//TODO убрать материал
-	IMaterial getMatherial();
+	Material getMatherial();
 	Node getNode(int number) throws Exception;
 	
 	int getGlobalIndex();

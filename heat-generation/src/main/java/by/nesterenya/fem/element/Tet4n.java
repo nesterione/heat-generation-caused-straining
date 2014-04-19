@@ -5,19 +5,18 @@ import static by.nesterenya.fem.solver.MMath.DET;
 import java.util.Map;
 
 import by.nesterenya.fem.element.Node.Axis;
-import by.nesterenya.fem.element.material.IMaterial;
+import by.nesterenya.fem.element.material.Material;
 
 public class Tet4n implements Element {
 
   private final static int NODE_COUNT = 4;
 
-  //TODO хранить не номер материала а ссылку, может быть, подумать
   private int numberMaterial;
-  private Map<Integer, IMaterial> materials;
+  private Map<Integer, Material> materials;
   private Node nodes[];
   private int globalIndex;
   
-  public Tet4n(int globalIndex, int materialId, Node nodes[], Map<Integer, IMaterial> materials, int numberMaterial) throws Exception {
+  public Tet4n(int globalIndex, int materialId, Node nodes[], Map<Integer, Material> materials, int numberMaterial) throws Exception {
     if(nodes.length!=NODE_COUNT)
       throw new Exception("При создании элемента, передано недостаточное количество узлов");
     
@@ -28,7 +27,7 @@ public class Tet4n implements Element {
   }
 
   @Override
-  public IMaterial getMatherial() {
+  public Material getMatherial() {
     return materials.get(numberMaterial);
   }
 

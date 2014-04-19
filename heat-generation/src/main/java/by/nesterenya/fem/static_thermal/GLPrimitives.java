@@ -15,7 +15,7 @@ public class GLPrimitives {
    * @param box - примертив для отрисовки
    */
   public static void drawBox(GL2 gl, Box box) {
-    gl.glBegin(GL2GL3.GL_QUADS); // draw using quads
+    gl.glBegin(GL2GL3.GL_QUADS);
 
     // Bottom
     gl.glVertex3d(0, 0, 0);
@@ -56,7 +56,6 @@ public class GLPrimitives {
     gl.glEnd();
   }
 
-  // TODO дать нормальное название методу
   public static void drawCoordinateSystem(GL2 gl) {
     gl.glPushMatrix();
     gl.glLineWidth(2);

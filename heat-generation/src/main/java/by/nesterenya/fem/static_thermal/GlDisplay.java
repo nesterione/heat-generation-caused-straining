@@ -13,9 +13,8 @@ import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
-import by.nesterenya.fem.mesh.IMesh;
-import by.nesterenya.fem.primitives.Box;
-  
+
+//TODO refact this
 public class GlDisplay extends GLCanvas implements GLEventListener {
 
 	//TODO сделать битовый вектор вместо этого перечисления

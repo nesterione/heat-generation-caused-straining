@@ -1,6 +1,6 @@
 package by.nesterenya.fem.boundary;
 
-public class StaticTemperature implements ILoad {
+public class StaticTemperature implements Load {
   private double temperature;
   private Boundary boundary;
   

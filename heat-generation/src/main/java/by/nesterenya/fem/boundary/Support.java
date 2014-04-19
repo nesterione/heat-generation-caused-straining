@@ -1,6 +1,6 @@
 package by.nesterenya.fem.boundary;
 
-public class Support implements ILoad {
+public class Support implements Load {
 	private Boundary boundary;
 
 	public Support(Boundary boundary) {

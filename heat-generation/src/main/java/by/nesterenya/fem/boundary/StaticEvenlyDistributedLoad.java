@@ -1,6 +1,6 @@
 package by.nesterenya.fem.boundary;
 
-public class StaticEvenlyDistributedLoad implements ILoad {
+public class StaticEvenlyDistributedLoad implements Load {
 	private double load;
 	private Boundary boundary;
 

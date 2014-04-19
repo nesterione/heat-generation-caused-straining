@@ -20,22 +20,19 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.plaf.DimensionUIResource;
 
-import by.nesterenya.fem.analysis.init.*;
-import by.nesterenya.fem.analysis.result.StaticStructuralResult;
 import by.nesterenya.fem.analysis.StaticDeformationAlalysis;
-import by.nesterenya.fem.boundary.ILoad;
+import by.nesterenya.fem.boundary.Load;
 import by.nesterenya.fem.boundary.StaticEvenlyDistributedLoad;
-import by.nesterenya.fem.boundary.StaticTemperature;
 import by.nesterenya.fem.boundary.Support;
 import by.nesterenya.fem.element.material.Material;
 import by.nesterenya.fem.mesh.BoxMesher;
-import by.nesterenya.fem.mesh.IMesh;
-import by.nesterenya.fem.mesh.IMesher;
+import by.nesterenya.fem.mesh.Mesh;
+import by.nesterenya.fem.mesh.Mesher;
 import by.nesterenya.fem.primitives.Box;
 import by.nesterenya.fem.static_thermal.GlDisplay.DisplayType;
 
 import com.jogamp.opengl.util.FPSAnimator;
-//TODO переместить в пакетд dynamic thermal
+//TODO переместить в другой пакет
 public class STModeling implements ActionListener {
 
 	/**
@@ -95,7 +92,6 @@ public class STModeling implements ActionListener {
 					double oy = Math.abs(currentY - lastY);
 					double ox = Math.abs(currentX - lastX);
 
-					// TODO убрать числовые значения
 					if (oy < ox) {
 
 						if (lastX < currentX) {
@@ -168,14 +164,13 @@ public class STModeling implements ActionListener {
 				double box_oz = Double.parseDouble(tb_plateHeight.getText());
 				Box box = new Box(box_ox, box_oy, box_oz);
 				
-				//TODO объеденить параметры сетки в одни класс
 				int nodeCountOX =  Integer.parseInt(tb_nodeCountOX.getText());
 				int nodeCountOY =  Integer.parseInt(tb_nodeCountOY.getText());
 				int nodeCountOZ =  Integer.parseInt(tb_nodeCountOZ.getText());
 				
-				IMesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
+				Mesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
 				
-				IMesh mesh = null;
+				Mesh mesh = null;
 				
 				try {
 					 mesh = mesher.formMesh();
@@ -207,18 +202,16 @@ public class STModeling implements ActionListener {
 				
 			Box box = new Box(box_ox, box_oy, box_oz);
 				
-			//TODO объеденить параметры сетки в одни класс
 			int nodeCountOX =  Integer.parseInt(tb_nodeCountOX.getText());
 			int nodeCountOY =  Integer.parseInt(tb_nodeCountOY.getText());
 			int nodeCountOZ =  Integer.parseInt(tb_nodeCountOZ.getText());
 				
-			IMesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
+			Mesher mesher = new BoxMesher(box, nodeCountOX, nodeCountOY, nodeCountOZ);
 				
-			IMesh mesh = null;
+			Mesh mesh = null;
 			try {
 				 mesh = mesher.formMesh();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 				
@@ -226,19 +219,13 @@ public class STModeling implements ActionListener {
 			
 			analysis.setGeometry(box);
 			analysis.setMesh(mesh);
-			//analysis.setDataInit(new DataInitThermalStatic(300));
 				
-			List<ILoad> loads = new ArrayList<>();
+			List<Load> loads = new ArrayList<>();
 			//TODO: задавать направление действия силы
-			loads.add( new StaticEvenlyDistributedLoad(1100000000, analysis.getMesh().getBoundaries().get("верхняя")));
-			//loads.add( new StaticEvenlyDistributedLoad(100000, analysis.getMesh().getBoundaries().get("верхняя")));
-			    
+			loads.add( new StaticEvenlyDistributedLoad(1100000000, analysis.getMesh().getBoundaries().get("верхняя")));    
 			
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("левая")) );
 			loads.add( new Support(analysis.getMesh().getBoundaries().get("правая")) );
-			
-			//loads.add(new StaticTemperature(400, analysis.getMesh().getBoundaries().get("левая")));
-			//loads.add(new StaticTemperature(300, analysis.getMesh().getBoundaries().get("правая")));
 			
 			Material material = new Material();
 			material.setDensity(7850);
@@ -257,14 +244,10 @@ public class STModeling implements ActionListener {
 			try {
 				analysis.solve();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-//			задавать силу
-			// TODO F = A*sin(w*t)
-			
-			//glDisplay.setModel(box);
+				
+			// TODO задавать силу F = A*sin(w*t)
 			glDisplay.setAnalysisD(analysis);
 			glDisplay.setDisplayType(DisplayType.STRAIN_TEMPERATURE);
 			glDisplay.display();
@@ -286,7 +269,5 @@ public class STModeling implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-
 	}
 }

@@ -3,8 +3,8 @@ package by.nesterenya.fem.analysis;
 import java.util.List;
 
 import by.nesterenya.fem.analysis.result.StaticStructuralResult;
-import by.nesterenya.fem.boundary.ILoad;
-import by.nesterenya.fem.mesh.IMesh;
+import by.nesterenya.fem.boundary.Load;
+import by.nesterenya.fem.mesh.Mesh;
 import by.nesterenya.fem.primitives.Box;
 import by.nesterenya.fem.solver.StaticDeformationSolver;
 
@@ -18,19 +18,19 @@ public class StaticDeformationAlalysis extends Analysis {
 		this.geometry = geometry;
 	}
 
-	public IMesh getMesh() {
+	public Mesh getMesh() {
 		return mesh;
 	}
 
-	public void setMesh(IMesh mesh) {
+	public void setMesh(Mesh mesh) {
 		this.mesh = mesh;
 	}
 
-	public List<ILoad> getLoads() {
+	public List<Load> getLoads() {
 		return loads;
 	}
 
-	public void setLoads(List<ILoad> loads) {
+	public void setLoads(List<Load> loads) {
 		this.loads = loads;
 	}
 
@@ -44,7 +44,6 @@ public class StaticDeformationAlalysis extends Analysis {
 
 	@Override
 	public void solve() throws Exception {
-		// TODO задать РЕШАТЕЛЬ
 		StaticDeformationSolver solver = new StaticDeformationSolver(this);
 		solver.Solve();
 	}

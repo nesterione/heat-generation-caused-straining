@@ -10,10 +10,10 @@ import by.nesterenya.fem.element.Element;
 import by.nesterenya.fem.element.Node;
 import by.nesterenya.fem.element.Node3d;
 import by.nesterenya.fem.element.Tet4n;
-import by.nesterenya.fem.element.material.IMaterial;
+import by.nesterenya.fem.element.material.Material;
 import by.nesterenya.fem.primitives.Box;
-
-public class BoxMesher implements IMesher {
+//TODO refactor
+public class BoxMesher implements Mesher {
 
 	private Box box;
 	private int nodeCountOX;
@@ -60,11 +60,11 @@ public class BoxMesher implements IMesher {
 	}
 
 	@Override
-	public IMesh formMesh() throws Exception {
+	public Mesh formMesh() throws Exception {
 		Map<String, Boundary> boundaries = initBoundariesMap(getBox());
 		List<Node> nodes = new ArrayList<>();
 		List<Element> elements = new ArrayList<>();
-		Map<Integer, IMaterial> materials = new HashMap<>();
+		Map<Integer, Material> materials = new HashMap<>();
 
 		int nCntOX = getNodeCountOX();
 		int nCntOY = getNodeCountOY();
@@ -162,7 +162,7 @@ public class BoxMesher implements IMesher {
 					int k = nodesOnLayerCount * (iz + 1) + (iy + 1) * nCntOX
 							+ ix;
 
-					// Убрать длинные строки
+					//TODO Убрать длинные строки
 
 					// knip
 					elements.add(new Tet4n(counter++,0, new Node[] { nodes.get(n),
@@ -197,7 +197,7 @@ public class BoxMesher implements IMesher {
 			}
 
 		// Creating BoxMesh
-		Mesh mesh = new Mesh(nodes, elements, materials, boundaries);
+		MeshBox mesh = new MeshBox(nodes, elements, materials, boundaries);
 
 		return mesh;
 	}
