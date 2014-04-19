@@ -267,7 +267,7 @@ public class StaticDeformationSolver {
 	
 	private Map<Node, Deformation> evaluateDeformationResult(double[] result) {
 		
-		Map<Node, Deformation> deformations = new HashMap<>();
+		Map<Node, Deformation> deformations = new HashMap<>(analysis.getMesh().getNodes().size());
 		int dodesCount = analysis.getMesh().getNodes().size();
 		
 		for(int i = 0; i< dodesCount; i++) {	
@@ -299,7 +299,7 @@ public class StaticDeformationSolver {
 	
 	private Map<Element, Strain> evaluateStrainResult(Map<Node, Deformation> deformations) throws Exception {
 		
-		Map<Element, Strain> strains = new HashMap<>();
+		Map<Element, Strain> strains = new HashMap<>(analysis.getMesh().getElements().size());
 		List<Element> elements = analysis.getMesh().getElements();
 		
 		for (Element element : elements) {
@@ -316,12 +316,11 @@ public class StaticDeformationSolver {
 	
 	/**
 	 * form values of equivalent of strain in nodes
-	 * TODO maybe to delete COUNT_NODES and other and move it into appropriate classes
 	 * @throws Exception 
 	 */
 	private Map<Node, NodalStrain> evaluateNodalStrainResult(Map<Element, Strain> strains) throws Exception {
 		
-		Map<Node, NodalStrain> nodalStrains = new HashMap<>();
+		Map<Node, NodalStrain> nodalStrains = new HashMap<>(analysis.getMesh().getNodes().size());
 		
 		for(Element element : analysis.getMesh().getElements()) {
 			
@@ -352,7 +351,7 @@ public class StaticDeformationSolver {
 	private Map<Element, StrainEnergy> evaluateStrainEnergyResult(Map<Node, Deformation> deformations) throws Exception {
 		
 		List<Element> elements = analysis.getMesh().getElements();
-		Map<Element, StrainEnergy> strainEnergies = new HashMap<>();
+		Map<Element, StrainEnergy> strainEnergies = new HashMap<>(elements.size());
 		
 		for (Element element : elements) {
 			double[] res = evaluateElementsDeformations(element, deformations);
@@ -367,10 +366,9 @@ public class StaticDeformationSolver {
 		return strainEnergies;
 	}
 	
-	//TODO Add capacity to collections for init
 	private Map<Node, Temperature> evaluateStrainTempereature(Map<Element, StrainEnergy> energies) throws Exception {
 		
-		Map<Node, Temperature> temperatures = new HashMap<>();
+		Map<Node, Temperature> temperatures = new HashMap<>(analysis.getMesh().getNodes().size());
 		List<Element> elements = analysis.getMesh().getElements();
 		
 		for (Element element : elements) {
